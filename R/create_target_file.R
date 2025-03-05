@@ -58,9 +58,12 @@ create_target_file <- function(
     # doesn't take VSI yet; so convert to stars first instead:
     # write_tif(target, dir, "lai_recovery_target_") 
     
-    target %>% 
-      stars::st_as_stars() %>%
-      stars::write_stars(out)
+    # target %>% 
+    #  stars::st_as_stars() %>%
+    #  stars::write_stars(out)
+
+    target <- target %>% stars::st_as_stars()
+    stars::write_stars(target, out, update = TRUE)
   }
   #return target
   invisible(out)
