@@ -44,7 +44,7 @@ Next, we want to generate and store a target file to evaluate our (eventual) for
 date <- '2023-06-01'
 target <- create_target_file(cuberast = raster_cube,
                              date = date,
-                             dir = "/vsis3/spat4cast-targets",
+                             dir = "/spat4cast-targets",
                              mask = fire_box$maskLayer)
 
 ```
