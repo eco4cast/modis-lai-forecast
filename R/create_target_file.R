@@ -63,7 +63,7 @@ create_target_file <- function(
     #  stars::write_stars(out)
 
     target <- target %>% stars::st_as_stars()
-    stars::write_stars(target, out, update = TRUE)
+    stars::write_stars(target, out)
   }
   #return target
   invisible(out)
