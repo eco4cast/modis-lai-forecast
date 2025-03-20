@@ -15,7 +15,9 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    container: rocker/geospatial:4.3.1
+    container: 
+      image: rocker/geospatial:4.3.1
+      options: --user root --security-opt seccomp=unconfined
     steps:
       - uses: actions/checkout@v4.2.2
       - name: system deps
