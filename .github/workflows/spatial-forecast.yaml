@@ -21,7 +21,7 @@ jobs:
       image: ghcr.io/boettiger-lab/nasa-tops:latest
       options: --user root --security-opt seccomp=unconfined
     steps:
-#      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.2.2
 #      - name: system deps
 #        run: sudo apt-get update && sudo apt-get -y install cargo
         
