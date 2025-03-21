@@ -15,7 +15,8 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE: "YES"
+      AWS_S3_ENDPOINT: "data.ecoforecast.org"
+      AWS_VIRTUAL_HOSTING: FALSE
     container: 
       image: rocker/geospatial:4.3.1
       options: --user root --security-opt seccomp=unconfined
