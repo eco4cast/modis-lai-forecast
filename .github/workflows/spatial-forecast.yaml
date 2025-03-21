@@ -32,8 +32,10 @@ jobs:
       
       - name: 
         shell: Rscript {0}
-        run: install.packages("quarto")
-        
+        run: install.packages(c("quarto", "scoringRules"))
+      - name: 
+        shell: Rscript {0}
+        run: install_github("eco4cast/score4cast")        
       - name: Run example
         shell: Rscript {0}
         run: |
