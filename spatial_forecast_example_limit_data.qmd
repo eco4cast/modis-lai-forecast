@@ -90,7 +90,7 @@ mirror scores directory to public storage:
 ```{r}
 library(minioclient) # remotes::install_github("cboettig/minioclient")
 mc_alias_set("efi", "data.ecoforecast.org", 
-             Sys.getenv("EFI_KEY"), Sys.getenv("EFI_SECRET"))
+             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
 mc_mirror("scores/", "efi/spat4cast-scores/lai_recovery/")
 
