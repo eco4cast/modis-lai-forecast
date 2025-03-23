@@ -33,7 +33,7 @@ jobs:
       
       - name: 
         shell: Rscript {0}
-        run: install.packages(c("quarto", "scoringRules", "minioclient"))
+        run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes"))
         
       - name: Run example
         shell: Rscript {0}
