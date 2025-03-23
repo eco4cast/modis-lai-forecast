@@ -31,9 +31,12 @@ jobs:
 #        with:
 #          cache-version: 3
       
-      - name: 
+      - name: install deps
         shell: Rscript {0}
         run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes", "here"))
+
+      - name: test mc
+        run: wget https://raw.githubusercontent.com/cboettig/minioclient/refs/heads/main/tests/testthat/test-mc.R && Rscript test-mc.R
         
       - name: Run example
         shell: Rscript {0}
