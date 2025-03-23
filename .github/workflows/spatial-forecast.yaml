@@ -40,6 +40,9 @@ jobs:
         run: |
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
           library(minioclient)
+          install_mc()
+          fs::dir_ls(minioclient:::minio_path())
+          
           x <- mc_alias_ls("play")
           x <- mc_alias_set("anon", "s3.amazonaws.com",
                             access_key = "", secret_key = "")
