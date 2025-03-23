@@ -18,21 +18,21 @@ jobs:
       AWS_S3_ENDPOINT: "data.ecoforecast.org"
       AWS_VIRTUAL_HOSTING: FALSE
     container: 
-      image: rocker/geospatial:4.3.1
+      image: rocker/geospatial
       options: --user root --security-opt seccomp=unconfined
     steps:
       - uses: actions/checkout@v4.2.2
       - name: system deps
         run: sudo apt-get update && sudo apt-get -y install cargo
         
-      - name: Install packages from renv.lock (with cache)
-        uses: r-lib/actions/setup-renv@v2
-        with:
-          cache-version: 3
+#      - name: Install packages from renv.lock (with cache)
+#        uses: r-lib/actions/setup-renv@v2
+#        with:
+#          cache-version: 3
       
       - name: 
         shell: Rscript {0}
-        run: install.packages("quarto")
+        run: install.packages(c("quarto", "scoringRules", "minioclient"))
         
       - name: Run example
         shell: Rscript {0}
