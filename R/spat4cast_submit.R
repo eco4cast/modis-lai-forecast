@@ -2,6 +2,7 @@
 #'
 #' @param dir A directory of .tif files for scoring
 #' @param model_id A unique ID representing your group and model
+#' @param reference_date the date the forecast is produced
 #' @param variable The data source being forecasted. Currently "lai_recovery" is the only option.
 #' @param site_id The side ID of the area being forecasted. Currently "august_complex" is the only option.
 #'
@@ -12,6 +13,7 @@
 
 spat4cast_submit <- function(dir, 
                              model_id,
+                             reference_date=Sys.Date(),
                              variable = c("lai_recovery"), 
                              site_id = c("august_complex")) {
   
