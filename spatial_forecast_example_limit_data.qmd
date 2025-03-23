@@ -89,6 +89,7 @@ mirror scores directory to public storage:
 
 ```{r}
 library(minioclient) # remotes::install_github("cboettig/minioclient")
+install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", 
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
