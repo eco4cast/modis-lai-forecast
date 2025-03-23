@@ -41,6 +41,4 @@ jobs:
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
           library(minioclient)
           install_mc()
-          fs::dir_ls(minioclient:::minio_path())
-          mc_alias_ls("play")
           quarto::quarto_render("spatial_forecast_example_limit_data.qmd")
