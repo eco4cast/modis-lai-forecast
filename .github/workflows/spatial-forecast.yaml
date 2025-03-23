@@ -39,7 +39,8 @@ jobs:
         shell: Rscript {0}
         run: |
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
-              x <- mc_alias_ls("play")
+          library(minioclient)
+          x <- mc_alias_ls("play")
           x <- mc_alias_set("anon", "s3.amazonaws.com",
                             access_key = "", secret_key = "")
           x <- mc_ls("anon/gbif-open-data-us-east-1")
