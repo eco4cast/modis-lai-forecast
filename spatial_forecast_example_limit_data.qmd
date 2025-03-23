@@ -61,7 +61,7 @@ ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
                                           dir = 'climatology')
 
 ensemble_forecast_dir |>
-  spat4cast_submit()
+  spat4cast_submit("climatology-model")
 ```
 
 Finally, we want to score forecasts. We demonstrate this on our ensemble climatology forecast using the function `scoring_spat_ensemble()`. This function takes three arguments: the directory that ensemble forecasts are stored in (`fc_dir`), the directory that the target is stored in (`target_dir`), and the directory to write the scores geotiff file to (`scores_dir`).
