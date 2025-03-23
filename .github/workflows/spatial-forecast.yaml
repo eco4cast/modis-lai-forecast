@@ -17,6 +17,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_S3_ENDPOINT: "data.ecoforecast.org"
       AWS_VIRTUAL_HOSTING: FALSE
+      R_USER_DATA_DIR: /tmp/gh/
     container: 
       image: rocker/geospatial
       options: --user root --security-opt seccomp=unconfined
