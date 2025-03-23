@@ -39,4 +39,5 @@ jobs:
         shell: Rscript {0}
         run: |
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
+          minioclient::install_mc()
           quarto::quarto_render("spatial_forecast_example_limit_data.qmd")
