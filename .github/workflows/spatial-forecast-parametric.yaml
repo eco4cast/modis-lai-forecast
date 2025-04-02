@@ -6,7 +6,7 @@ on:
     - cron: '0 1 1 * *' # runs on first of month
   workflow_dispatch:
 
-name: spatial-forecast
+name: spatial-forecast-parametric
 
 jobs:
   docker:
