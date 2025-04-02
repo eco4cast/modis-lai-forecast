@@ -92,6 +92,9 @@ Now, we create a parametric forecast by running an auto-arima on each grid cell.
 
 parametric_forecast_dir <- spat_arima_grid("./nimble_mat.csv", dir = 'parametric', target)
 
+parametric_forecast_dir |>
+  spat4cast_submit("arima-grid-model")
+
 scored_forecast_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir,
                                              target = target,
                                              scores_dir = 'scores')
