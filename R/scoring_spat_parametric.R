@@ -206,14 +206,14 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   
   # Make raster for crps scores
   crps_raster <- 
-    terra::rast(extent(param_tiffs[1]), # Get dimensions from parameter raster
+    terra::rast(ext(param_tiffs[1]), # Get dimensions from parameter raster
                    res = res(param_tiffs[1]), # Get res from parameter raster
                    crs = crs(param_tiffs[1])) %>% # Get cood system from parameter raster
     setValues(crps_scores)
   
   # Make raster for log scores
   logs_raster <- 
-    terra::rast(extent(param_tiffs[1]), # Get dimensions from parameter raster
+    terra::rast(ext(param_tiffs[1]), # Get dimensions from parameter raster
                    res = res(param_tiffs[1]), # Get res from parameter raster
                    crs = crs(param_tiffs[1])) %>% # Get cood system from parameter raster
     setValues(logs_scores)
