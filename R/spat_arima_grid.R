@@ -54,7 +54,7 @@ spat_grid_ensemble <- function(data_csv, dir = 'parametric', target){
     # only generate forecasts for grid cells with 25+ observations
     if(sum(!is.na(mat_dat[,i])) >= 25){
       # fit arima 
-      model <- auto.arima(log(mat_dat[,i]))
+      model <- forecast::auto.arima(log(mat_dat[,i]))
       # store mean
       forecast_means[i] <- forecast(model, h = 1, level = 95)$mean
       # get sd from upper and lower forecast bounds
