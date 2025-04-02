@@ -43,7 +43,7 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   mat_dat <- read_csv(data_csv, na =c("", "NA", "0"))
   
   # Load target raster
-  target_raster <- terra::rast(target, vsi = TRUE)
+  target_rast <- terra::rast(target, vsi = TRUE)
   
   # Initialize objects to hold the lognormal mean and sd
   forecast_means <- c()
@@ -68,9 +68,13 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
     }
   }
   
-  # Set values for 
-  forecast_mu <- target_raster %>% terra::setValues(forecast_means)
-  forecast_sds<- target_raster %>% terra::setValues(forecast_sds)
+  ## convert parameters to raster
+  crps_scores <- logs_scores <- target_rast
+  values(forecast_mu) <- matrix(forecast_means, ncol = 1)
+  values(forecast_sds) <- matrix(forecast_sds, ncol = 1)
+  
+  ## check for scoring directory
+  dir.create(dir, FALSE)
   
   terra::writeRaster(forecast_mu, 
                      filename = paste0(dir,"/lognormal_mu_forecast.tif", 
