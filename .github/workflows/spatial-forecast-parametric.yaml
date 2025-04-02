@@ -33,7 +33,7 @@ jobs:
       
       - name: install deps
         shell: Rscript {0}
-        run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes", "here"))
+        run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes", "here", "forecast"))
         
       - name: Run example
         shell: Rscript {0}
