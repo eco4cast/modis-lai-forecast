@@ -72,10 +72,12 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   forecast_mu <- target_raster %>% terra::setValues(forecast_means)
   forecast_sds<- target_raster %>% terra::setValues(forecast_sds)
   
-  terra::writeRaster(forecast_mu, paste0(dir,"/lognormal_mu_forecast.tif", 
+  terra::writeRaster(forecast_mu, 
+                     filename = paste0(dir,"/lognormal_mu_forecast.tif", 
                                          overwrite = TRUE))
   
-  terra::writeRaster(forecast_sds, paste0(dir,"/lognormal_sigma_forecast.tif", 
+  terra::writeRaster(forecast_sds, 
+                     filename = paste0(dir,"/lognormal_sigma_forecast.tif", 
                                           overwrite = TRUE))
   
   
