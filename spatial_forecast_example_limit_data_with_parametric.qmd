@@ -1,7 +1,9 @@
 ---
 title: "spatial_forecast_example"
 author: "John, David, Emma, Carl"
-format: html
+format:
+  html:
+    embed-resources: TRUE
 editor: visual
 ---
 
