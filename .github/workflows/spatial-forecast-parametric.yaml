@@ -1,0 +1,43 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+
+on:
+  schedule:
+    - cron: '0 1 1 * *' # runs on first of month
+  workflow_dispatch:
+
+name: spatial-forecast
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_S3_ENDPOINT: "data.ecoforecast.org"
+      AWS_VIRTUAL_HOSTING: FALSE
+      R_USER_DATA_DIR: /tmp/gh/
+    container: 
+      image: rocker/geospatial
+      options: --user root --security-opt seccomp=unconfined
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: system deps
+        run: sudo apt-get update && sudo apt-get -y install cargo
+        
+#      - name: Install packages from renv.lock (with cache)
+#        uses: r-lib/actions/setup-renv@v2
+#        with:
+#          cache-version: 3
+      
+      - name: install deps
+        shell: Rscript {0}
+        run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes", "here"))
+        
+      - name: Run example
+        shell: Rscript {0}
+        run: |
+          Sys.setenv("R_USER_DATA_DIR"=tempdir())
+          minioclient::install_mc()
+          quarto::quarto_render("spatial_forecast_example_limit_data_with_parametric.qmd")

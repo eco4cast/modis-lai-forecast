@@ -30,10 +30,10 @@
 #' 
 
 
-spatial_score <- function(fc_dir, target_dir, scores_dir){
+scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   
   # get targets as a raster
-  target <- raster(paste0(target_dir,"/",list.files(path = target_dir)[1]))
+  target_rast <- rast(target, vsi=TRUE)
   
   # identify parametric forecast family
   family = str_split_1(list.files(path = fc_dir)[1], "_")[1]
@@ -46,15 +46,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_lnorm(getValues(target), 
-                             getValues(param_tiffs$mu), 
-                             getValues(param_tiffs$sigma))
-    logs_scores = logs_lnorm(getValues(target), 
-                             getValues(param_tiffs$mu), 
-                             getValues(param_tiffs$sigma))
+    crps_scores = scoringRules::crps_lnorm(getValues(target), 
+                                           getValues(param_tiffs$mu), 
+                                           getValues(param_tiffs$sigma))
+    logs_scores = scoringRules::logs_lnorm(getValues(target), 
+                                           getValues(param_tiffs$mu), 
+                                           getValues(param_tiffs$sigma))
   }
   
   if( family == "normal"){
@@ -65,15 +65,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_norm(getValues(target), 
-                            getValues(param_tiffs$mu),
-                            getValues(param_tiffs$sigma))
-    logs_scores = logs_norm(getValues(target), 
-                            getValues(param_tiffs$mu),
-                            getValues(param_tiffs$sigma))
+    crps_scores = scoringRules::crps_norm(getValues(target), 
+                                          getValues(param_tiffs$mu),
+                                          getValues(param_tiffs$sigma))
+    logs_scores = scoringRules::logs_norm(getValues(target), 
+                                          getValues(param_tiffs$mu),
+                                          getValues(param_tiffs$sigma))
   }
   
   if( family == "bernoulli"){
@@ -84,13 +84,13 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_binom(getValues(target), 
-                             getValues(param_tiffs$prob))
-    logs_scores = logs_binom(getValues(target), 
-                             getValues(param_tiffs$prob))
+    crps_scores = scoringRules::crps_binom(getValues(target), 
+                                           getValues(param_tiffs$prob))
+    logs_scores = scoringRules::logs_binom(getValues(target), 
+                                           getValues(param_tiffs$prob))
   }
   
   if( family == "beta"){
@@ -101,15 +101,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_beta(getValues(target), 
-                            getValues(param_tiffs$shape1),
-                            getValues(param_tiffs$shape2))
-    logs_scores = logs_beta(getValues(target), 
-                            getValues(param_tiffs$shape1),
-                            getValues(param_tiffs$shape2))
+    crps_scores = scoringRules::crps_beta(getValues(target), 
+                                          getValues(param_tiffs$shape1),
+                                          getValues(param_tiffs$shape2))
+    logs_scores = scoringRules::logs_beta(getValues(target), 
+                                          getValues(param_tiffs$shape1),
+                                          getValues(param_tiffs$shape2))
   }
   
   if( family == "uniform"){
@@ -120,15 +120,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_unif(getValues(target), 
-                            getValues(param_tiffs$min),
-                            getValues(param_tiffs$max))
-    logs_scores = logs_unif(getValues(target), 
-                            getValues(param_tiffs$min),
-                            getValues(param_tiffs$max))
+    crps_scores = scoringRules::crps_unif(getValues(target), 
+                                          getValues(param_tiffs$min),
+                                          getValues(param_tiffs$max))
+    logs_scores = scoringRules::logs_unif(getValues(target), 
+                                          getValues(param_tiffs$min),
+                                          getValues(param_tiffs$max))
   }
   
   if( family == "gamma"){
@@ -139,15 +139,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_gamma(getValues(target), 
-                            getValues(param_tiffs$shape),
-                            getValues(param_tiffs$rate))
-    logs_scores = logs_gamma(getValues(target), 
-                            getValues(param_tiffs$shape),
-                            getValues(param_tiffs$rate))
+    crps_scores = scoringRules::crps_gamma(getValues(target), 
+                                           getValues(param_tiffs$shape),
+                                           getValues(param_tiffs$rate))
+    logs_scores = scoringRules::logs_gamma(getValues(target), 
+                                           getValues(param_tiffs$shape),
+                                           getValues(param_tiffs$rate))
   }
   
   if( family == "logistic"){
@@ -158,15 +158,15 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_logis(getValues(target), 
-                            getValues(param_tiffs$location),
-                            getValues(param_tiffs$scale))
-    logs_scores = logs_logis(getValues(target), 
-                            getValues(param_tiffs$location),
-                            getValues(param_tiffs$scale))
+    crps_scores = scoringRules::crps_logis(getValues(target), 
+                                           getValues(param_tiffs$location),
+                                           getValues(param_tiffs$scale))
+    logs_scores = scoringRules::logs_logis(getValues(target), 
+                                           getValues(param_tiffs$location),
+                                           getValues(param_tiffs$scale))
   }
   
   if( family == "exponential"){
@@ -177,13 +177,13 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_exp(getValues(target), 
-                            getValues(param_tiffs$rate))
-    logs_scores = logs_exp(getValues(target), 
-                            getValues(param_tiffs$rate))
+    crps_scores = scoringRules::crps_exp(getValues(target), 
+                                         getValues(param_tiffs$rate))
+    logs_scores = scoringRules::logs_exp(getValues(target), 
+                                         getValues(param_tiffs$rate))
   }
   
   if( family == "poisson"){
@@ -194,35 +194,35 @@ spatial_score <- function(fc_dir, target_dir, scores_dir){
     # Make rasters for parameters by name
     for (i in 1:length(params)){
       ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- raster(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = crps_pois(getValues(target), 
-                            getValues(param_tiffs$lambda))
-    logs_scores = logs_pois(getValues(target), 
-                            getValues(param_tiffs$lambda))
+    crps_scores = scoringRules::crps_pois(getValues(target), 
+                                          getValues(param_tiffs$lambda))
+    logs_scores = scoringRules::logs_pois(getValues(target), 
+                                          getValues(param_tiffs$lambda))
   }
   
   
   # Make raster for crps scores
   crps_raster <- 
-    raster::raster(extent(param_tiffs[1]), # Get dimensions from parameter raster
+    terra::rast(extent(param_tiffs[1]), # Get dimensions from parameter raster
                    res = res(param_tiffs[1]), # Get res from parameter raster
                    crs = crs(param_tiffs[1])) %>% # Get cood system from parameter raster
     setValues(crps_scores)
   
   # Make raster for log scores
   logs_raster <- 
-    raster::raster(extent(param_tiffs[1]), # Get dimensions from parameter raster
+    terra::rast(extent(param_tiffs[1]), # Get dimensions from parameter raster
                    res = res(param_tiffs[1]), # Get res from parameter raster
                    crs = crs(param_tiffs[1])) %>% # Get cood system from parameter raster
     setValues(logs_scores)
   
   # Save scores into .tifs
-  raster::writeRaster(crps_raster, 
+  terra::writeRaster(crps_raster, 
                      filename = paste0(scores_dir, "/crps_scores.tif"),
                      overwrite=TRUE)
-  raster::writeRaster(logs_raster, 
+  terra::writeRaster(logs_raster, 
                      filename = paste0(scores_dir, '/logs_scores.tif'),
                      overwrite=TRUE)
   
