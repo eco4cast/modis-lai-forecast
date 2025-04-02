@@ -22,7 +22,7 @@
 #' 
 
 
-spat_grid_ensemble <- function(data_csv, dir = 'parametric', target){
+spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   ## FUNCTION: spat_grid_ensemble
   ## PURPOSE: spat_grid_ensemble takes a data matrix, target, and directory
   ## and generates a one-step-ahead arima forecast for each grid.
