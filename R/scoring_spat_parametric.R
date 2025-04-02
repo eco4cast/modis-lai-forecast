@@ -49,10 +49,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_lnorm(values(target), 
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
                                            values(param_tiffs$mu), 
                                            values(param_tiffs$sigma))
-    logs_scores = scoringRules::logs_lnorm(values(target), 
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
                                            values(param_tiffs$mu), 
                                            values(param_tiffs$sigma))
   }
@@ -68,10 +68,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_norm(values(target), 
+    crps_scores = scoringRules::crps_norm(values(target_rast), 
                                           values(param_tiffs$mu),
                                           values(param_tiffs$sigma))
-    logs_scores = scoringRules::logs_norm(values(target), 
+    logs_scores = scoringRules::logs_norm(values(target_rast), 
                                           values(param_tiffs$mu),
                                           values(param_tiffs$sigma))
   }
@@ -87,9 +87,9 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_binom(values(target), 
+    crps_scores = scoringRules::crps_binom(values(target_rast), 
                                            values(param_tiffs$prob))
-    logs_scores = scoringRules::logs_binom(values(target), 
+    logs_scores = scoringRules::logs_binom(values(target_rast), 
                                            values(param_tiffs$prob))
   }
   
@@ -104,10 +104,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_beta(values(target), 
+    crps_scores = scoringRules::crps_beta(values(target_rast), 
                                           values(param_tiffs$shape1),
                                           values(param_tiffs$shape2))
-    logs_scores = scoringRules::logs_beta(values(target), 
+    logs_scores = scoringRules::logs_beta(values(target_rast), 
                                           values(param_tiffs$shape1),
                                           values(param_tiffs$shape2))
   }
@@ -123,10 +123,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_unif(values(target), 
+    crps_scores = scoringRules::crps_unif(values(target_rast), 
                                           values(param_tiffs$min),
                                           values(param_tiffs$max))
-    logs_scores = scoringRules::logs_unif(values(target), 
+    logs_scores = scoringRules::logs_unif(values(target_rast), 
                                           values(param_tiffs$min),
                                           values(param_tiffs$max))
   }
@@ -142,10 +142,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_gamma(values(target), 
+    crps_scores = scoringRules::crps_gamma(values(target_rast), 
                                            values(param_tiffs$shape),
                                            values(param_tiffs$rate))
-    logs_scores = scoringRules::logs_gamma(values(target), 
+    logs_scores = scoringRules::logs_gamma(values(target_rast), 
                                            values(param_tiffs$shape),
                                            values(param_tiffs$rate))
   }
@@ -161,10 +161,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_logis(values(target), 
+    crps_scores = scoringRules::crps_logis(values(target_rast), 
                                            values(param_tiffs$location),
                                            values(param_tiffs$scale))
-    logs_scores = scoringRules::logs_logis(values(target), 
+    logs_scores = scoringRules::logs_logis(values(target_rast), 
                                            values(param_tiffs$location),
                                            values(param_tiffs$scale))
   }
@@ -180,9 +180,9 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_exp(values(target), 
+    crps_scores = scoringRules::crps_exp(values(target_rast), 
                                          values(param_tiffs$rate))
-    logs_scores = scoringRules::logs_exp(values(target), 
+    logs_scores = scoringRules::logs_exp(values(target_rast), 
                                          values(param_tiffs$rate))
   }
   
@@ -197,9 +197,9 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_pois(values(target), 
+    crps_scores = scoringRules::crps_pois(values(target_rast), 
                                           values(param_tiffs$lambda))
-    logs_scores = scoringRules::logs_pois(values(target), 
+    logs_scores = scoringRules::logs_pois(values(target_rast), 
                                           values(param_tiffs$lambda))
   }
   
