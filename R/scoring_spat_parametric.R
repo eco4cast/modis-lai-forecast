@@ -49,12 +49,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_lnorm(getValues(target), 
-                                           getValues(param_tiffs$mu), 
-                                           getValues(param_tiffs$sigma))
-    logs_scores = scoringRules::logs_lnorm(getValues(target), 
-                                           getValues(param_tiffs$mu), 
-                                           getValues(param_tiffs$sigma))
+    crps_scores = scoringRules::crps_lnorm(values(target), 
+                                           values(param_tiffs$mu), 
+                                           values(param_tiffs$sigma))
+    logs_scores = scoringRules::logs_lnorm(values(target), 
+                                           values(param_tiffs$mu), 
+                                           values(param_tiffs$sigma))
   }
   
   if( family == "normal"){
@@ -68,12 +68,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_norm(getValues(target), 
-                                          getValues(param_tiffs$mu),
-                                          getValues(param_tiffs$sigma))
-    logs_scores = scoringRules::logs_norm(getValues(target), 
-                                          getValues(param_tiffs$mu),
-                                          getValues(param_tiffs$sigma))
+    crps_scores = scoringRules::crps_norm(values(target), 
+                                          values(param_tiffs$mu),
+                                          values(param_tiffs$sigma))
+    logs_scores = scoringRules::logs_norm(values(target), 
+                                          values(param_tiffs$mu),
+                                          values(param_tiffs$sigma))
   }
   
   if( family == "bernoulli"){
@@ -87,10 +87,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_binom(getValues(target), 
-                                           getValues(param_tiffs$prob))
-    logs_scores = scoringRules::logs_binom(getValues(target), 
-                                           getValues(param_tiffs$prob))
+    crps_scores = scoringRules::crps_binom(values(target), 
+                                           values(param_tiffs$prob))
+    logs_scores = scoringRules::logs_binom(values(target), 
+                                           values(param_tiffs$prob))
   }
   
   if( family == "beta"){
@@ -104,12 +104,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_beta(getValues(target), 
-                                          getValues(param_tiffs$shape1),
-                                          getValues(param_tiffs$shape2))
-    logs_scores = scoringRules::logs_beta(getValues(target), 
-                                          getValues(param_tiffs$shape1),
-                                          getValues(param_tiffs$shape2))
+    crps_scores = scoringRules::crps_beta(values(target), 
+                                          values(param_tiffs$shape1),
+                                          values(param_tiffs$shape2))
+    logs_scores = scoringRules::logs_beta(values(target), 
+                                          values(param_tiffs$shape1),
+                                          values(param_tiffs$shape2))
   }
   
   if( family == "uniform"){
@@ -123,12 +123,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_unif(getValues(target), 
-                                          getValues(param_tiffs$min),
-                                          getValues(param_tiffs$max))
-    logs_scores = scoringRules::logs_unif(getValues(target), 
-                                          getValues(param_tiffs$min),
-                                          getValues(param_tiffs$max))
+    crps_scores = scoringRules::crps_unif(values(target), 
+                                          values(param_tiffs$min),
+                                          values(param_tiffs$max))
+    logs_scores = scoringRules::logs_unif(values(target), 
+                                          values(param_tiffs$min),
+                                          values(param_tiffs$max))
   }
   
   if( family == "gamma"){
@@ -142,12 +142,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_gamma(getValues(target), 
-                                           getValues(param_tiffs$shape),
-                                           getValues(param_tiffs$rate))
-    logs_scores = scoringRules::logs_gamma(getValues(target), 
-                                           getValues(param_tiffs$shape),
-                                           getValues(param_tiffs$rate))
+    crps_scores = scoringRules::crps_gamma(values(target), 
+                                           values(param_tiffs$shape),
+                                           values(param_tiffs$rate))
+    logs_scores = scoringRules::logs_gamma(values(target), 
+                                           values(param_tiffs$shape),
+                                           values(param_tiffs$rate))
   }
   
   if( family == "logistic"){
@@ -161,12 +161,12 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_logis(getValues(target), 
-                                           getValues(param_tiffs$location),
-                                           getValues(param_tiffs$scale))
-    logs_scores = scoringRules::logs_logis(getValues(target), 
-                                           getValues(param_tiffs$location),
-                                           getValues(param_tiffs$scale))
+    crps_scores = scoringRules::crps_logis(values(target), 
+                                           values(param_tiffs$location),
+                                           values(param_tiffs$scale))
+    logs_scores = scoringRules::logs_logis(values(target), 
+                                           values(param_tiffs$location),
+                                           values(param_tiffs$scale))
   }
   
   if( family == "exponential"){
@@ -180,10 +180,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_exp(getValues(target), 
-                                         getValues(param_tiffs$rate))
-    logs_scores = scoringRules::logs_exp(getValues(target), 
-                                         getValues(param_tiffs$rate))
+    crps_scores = scoringRules::crps_exp(values(target), 
+                                         values(param_tiffs$rate))
+    logs_scores = scoringRules::logs_exp(values(target), 
+                                         values(param_tiffs$rate))
   }
   
   if( family == "poisson"){
@@ -197,10 +197,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
       param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
     } 
     
-    crps_scores = scoringRules::crps_pois(getValues(target), 
-                                          getValues(param_tiffs$lambda))
-    logs_scores = scoringRules::logs_pois(getValues(target), 
-                                          getValues(param_tiffs$lambda))
+    crps_scores = scoringRules::crps_pois(values(target), 
+                                          values(param_tiffs$lambda))
+    logs_scores = scoringRules::logs_pois(values(target), 
+                                          values(param_tiffs$lambda))
   }
   
   
