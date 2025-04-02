@@ -220,10 +220,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   
   # Save scores into .tifs
   terra::writeRaster(crps_raster, 
-                     filename = paste0(scores_dir, "/crps_scores.tif"),
+                     filename = paste0(scores_dir, "/crps_scores_parametric.tif"),
                      overwrite=TRUE)
   terra::writeRaster(logs_raster, 
-                     filename = paste0(scores_dir, '/logs_scores.tif'),
+                     filename = paste0(scores_dir, '/logs_scores_parametric.tif'),
                      overwrite=TRUE)
   
   
