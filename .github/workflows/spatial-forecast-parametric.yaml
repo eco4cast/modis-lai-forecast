@@ -41,3 +41,10 @@ jobs:
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
           minioclient::install_mc()
           quarto::quarto_render("spatial_forecast_example_limit_data_with_parametric.qmd")
+          
+      - name: save qmd output
+        uses: actions/upload-artifact@v4
+        with:
+          name: qmd-output
+          path: output/spatial_forecast_example_limit_data_with_parametric.html
+      
