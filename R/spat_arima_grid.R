@@ -69,7 +69,7 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   }
   
   ## convert parameters to raster
-  crps_scores <- logs_scores <- target_rast
+  forecast_sds <- forecast_mu <- target_rast
   values(forecast_mu) <- matrix(forecast_means, ncol = 1)
   values(forecast_sds) <- matrix(forecast_sds, ncol = 1)
   
