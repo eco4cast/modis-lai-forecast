@@ -4,6 +4,12 @@ format: html
 editor: visual
 ---
 
+```{r message = FALSE}
+knitr::opts_chunk$set(message=FALSE, warning = FALSE)
+suppressPackageStartupMessages(source("packages.R"))
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+```
+
 ## Lets apply scoring rules to all of the Forecasts
 
 ```{r}
