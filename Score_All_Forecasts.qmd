@@ -14,8 +14,9 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 ```{r}
 library(minioclient)
+install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", 
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-mc_ls("/submissions")
+mc_alias_ls("efi/spat4cast-submissions/")
 ```
