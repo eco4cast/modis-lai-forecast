@@ -1,0 +1,14 @@
+---
+title: "Apply Scores to Forecasts"
+format: html
+editor: visual
+---
+
+## Lets apply scoring rules to all of the Forecasts
+
+```{r}
+mc_alias_set("efi", "data.ecoforecast.org", 
+             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+
+mc_list("/forcasts")
+```
