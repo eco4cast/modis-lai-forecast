@@ -26,12 +26,6 @@ scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_compl
 # submitted <- lapply(submitted, str_extract, pattern = c("(?<=[:symbol:]).*" ))
 # scored <- lapply(scored, str_extract, pattern = c("(?<=[:symbol:]).*" ))
 
-A <- list("A","B","C")
-B <- list("A","B","C", "D", "E")
-
-B[which(!(B %in% A))]
-
-B %in% A
 subs_to_score <- list()
 
 for (i in submitted){
@@ -40,8 +34,8 @@ for (i in submitted){
   ref_dates_to_score <- submitted_ref_dates[!which((submitted_ref_dates %in% scored_ref_dates))]
   subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i, ref_dates_to_score))
 }
+print(ref_dates_to_score)
+
 print(subs_to_score)
 
-
-append(B, "Z")
 ```
