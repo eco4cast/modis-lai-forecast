@@ -16,37 +16,67 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(minioclient)
 library(stringr)
 install_mc()
-mc_alias_set("efi", "data.ecoforecast.org", 
-             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
+
+# Ingest data ------------------------------------------------------------
+gdalcubes::gdalcubes_options(parallel=TRUE)
+
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
+raster_cube <- ingest_planetary_data(start_date = "2019-01-01", 
+                                     end_date = "2023-07-01", 
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1, 
+                                     dy = 0.1, 
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+
+# create target file
+date <- '2023-06-01'
+target <- create_target_file(cuberast = raster_cube,
+                             date = date,
+                             dir = "/vsis3/spat4cast-targets",
+                             mask = fire_box$maskLayer)
+
+
+
+# mc_alias_set("efi", "data.ecoforecast.org", 
+#              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
 submitted <- mc_ls("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/")
 
 scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/")
 
-# submitted <- lapply(submitted, str_extract, pattern = c("(?<=[:symbol:]).*" ))
-# scored <- lapply(scored, str_extract, pattern = c("(?<=[:symbol:]).*" ))
-
 subs_to_score <- list()
-
-submitted <- submitted[1]
 
 for (i in submitted){
   # Get the reference dates for which there have been submissions
-  submitted_ref_dates <- mc_ls(paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", submitted))
+  submitted_ref_dates <- mc_ls(paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i))
   # Get the reference dates for which there have been scores
   scored_ref_dates <- mc_ls(paste0("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", scored))
   # Get the reference dates which haven't been scored
-  ref_dates_to_score <- submitted_ref_dates[!which((submitted_ref_dates %in% scored_ref_dates))]
+  ref_dates_to_score <- submitted_ref_dates[which(submitted_ref_dates %in% scored_ref_dates == 0)]
   # add the reference date files to a list of submissions that need to be scored.
-  subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", ref_dates_to_score))
+  subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i,  ref_dates_to_score))
   
 }
-print(submitted_ref_dates)
 
-print(scored_ref_dates)
-
-print(ref_dates_to_score)
-
-print(subs_to_score)
+for(i in subs_to_score){
+  
+  i = subs_to_score[1]
+  model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
+  files <- mc_ls(i)
+  parametric_ind <- if_else(1 %in% str_detect(files, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
+  if(parametric_ind == 1){
+    score_dir <- scoring_spat_parametric(i, target, "score_dir")
+    spat4cast_score_submit(score_dir, model_id)
+  }else{
+    
+  }
+  
+  print(parametric_ind)
+}
 
 ```
