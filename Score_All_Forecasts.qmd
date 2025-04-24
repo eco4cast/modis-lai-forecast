@@ -32,8 +32,13 @@ for (i in submitted){
   submitted_ref_dates <- mc_ls(paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", submitted))
   scored_ref_dates <- mc_ls(paste0("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", scored))
   ref_dates_to_score <- submitted_ref_dates[!which((submitted_ref_dates %in% scored_ref_dates))]
-  subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i, ref_dates_to_score))
+  subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", ref_dates_to_score))
+  
 }
+print(submitted_ref_dates)
+
+print(scored_ref_dates)
+
 print(ref_dates_to_score)
 
 print(subs_to_score)
