@@ -72,9 +72,9 @@ Finally, we want to score forecasts. We demonstrate this on our ensemble climato
 target <- "https://data.ecoforecast.org/spat4cast-targets/lai_recovery-target-2023-06-01.tif"
 
 ## generate and write geotiff file for scores
-scored_forecast_dir <- scoring_spat_ensemble(fc_dir = ensemble_forecast_dir,
+climatology_scored_forecast_dir <- scoring_spat_ensemble(fc_dir = ensemble_forecast_dir,
                                              target = target,
-                                             scores_dir = 'scores')
+                                             scores_dir = 'scores_climatology')
 ```
 
 Let's take a look at the performance of our climatology model.
@@ -97,9 +97,9 @@ parametric_forecast_dir <- spat_arima_grid("./nimble_mat.csv", dir = 'parametric
 parametric_forecast_dir |>
   spat4cast_submit("arima-grid-model")
 
-scored_forecast_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir,
+parametric_scored_forecast_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir,
                                              target = target,
-                                             scores_dir = 'scores')
+                                             scores_dir = 'scores_parametric')
 
 
 scores_crps <- rast('scores/crps_scores_parametric.tif')
@@ -118,6 +118,14 @@ install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", 
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-mc_mirror("scores/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/")
+climatology_scored_forecast_dir |>
+  spat4cast_submit("climatology-model")
+
+parametric_scored_forecast_dir |>
+  spat4cast_submit("arima-grid-model")
+
+# mc_mirror("scores_climatology/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/model_id=climatology-model\reference_date=")
+# 
+# mc_mirror("scores_parametric/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/model_id=arima-grid-model/reference_date=")
 
 ```
