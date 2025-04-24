@@ -69,7 +69,7 @@ for(i in subs_to_score){
   
   dir.create("files", FALSE)
   model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
-  mc_cp(i, "files")
+  mc_cp(i, "files", recursive = TRUE)
   file_names <- mc_ls(i)
   parametric_ind <- if_else(1 %in% str_detect(file_names, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
   if(parametric_ind == 1){
