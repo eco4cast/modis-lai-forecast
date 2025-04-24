@@ -36,7 +36,7 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   target_rast <- rast(target, vsi=TRUE)
   
   # identify parametric forecast family
-  family = str_split_1(dir_ls(path = paste0(fc_dir,"/")[1], "_")[1]
+  family = str_split_1(dir_ls(path = paste0(fc_dir,"/"))[1], "_")[1]
   
   if( family == "lognormal"){
     # parameters for lognormal distribution
