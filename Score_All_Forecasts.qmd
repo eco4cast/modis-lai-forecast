@@ -73,7 +73,7 @@ for(i in subs_to_score){
   parametric_ind <- if_else(1 %in% str_detect(file_names, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
   if(parametric_ind == 1){
     score_dir <- scoring_spat_parametric(file_dir, target, "score_dir")
-    spat4cast_score_submit(score_dir, model_id, reference_date = ref_dates_to_score[i])
+    spat4cast_score_submit(score_dir, model_id, reference_date = ref_date)
   }else{
     score_dir <- scoring_spat_ensemble(file_dir, target, "score_dir")
     spat4cast_score_submit(score_dir, model_id, reference_date = ref_date)
