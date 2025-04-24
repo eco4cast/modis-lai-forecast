@@ -119,10 +119,10 @@ mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
 climatology_scored_forecast_dir |>
-  spat4cast_submit("climatology-model")
+  spat4cast_score_submit("climatology-model")
 
 parametric_scored_forecast_dir |>
-  spat4cast_submit("arima-grid-model")
+  spat4cast_score_submit("arima-grid-model")
 
 # mc_mirror("scores_climatology/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/model_id=climatology-model\reference_date=")
 # 
