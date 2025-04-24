@@ -52,7 +52,7 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   # Loop through colums (grid cells) and fit lognormal arima
   for(i in 1:ncol(mat_dat)){
     # only generate forecasts for grid cells with 25+ observations
-    if(sum(!is.na(mat_dat[,i])) >= 25){
+    if(sum(is.na(mat_dat[,i]) != TRUE) >= 25){
       # fit arima 
       model <- forecast::auto.arima(log(mat_dat[,i]))
       # store mean
@@ -69,9 +69,10 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   }
   
   ## convert parameters to raster
-  forecast_sds <- forecast_mu <- target_rast
+  forecast_sigmas <- target_rast
+  forecast_mu <- target_rast
   values(forecast_mu) <- matrix(forecast_means, ncol = 1)
-  values(forecast_sds) <- matrix(forecast_sds, ncol = 1)
+  values(forecast_sigmas) <- matrix(forecast_sds, ncol = 1)
   
   ## check for scoring directory
   dir.create(dir, FALSE)
@@ -80,9 +81,9 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
                      filename = paste0(dir,"/lognormal_mu_forecast.tif"),
                      overwrite = TRUE)
   
-  terra::writeRaster(forecast_sds, 
+  terra::writeRaster(forecast_sigmas, 
                      filename = paste0(dir,"/lognormal_sigma_forecast.tif"),
-                                          overwrite = TRUE)
+                     overwrite = TRUE)
   
   
   

@@ -35,6 +35,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   # get targets as a raster
   target_rast <- rast(target, vsi=TRUE)
   
+  ## create vector of observations from target rast
+  y <- as.vector(values(target_rast))
+  mask <- is.na(y)
+  
   # identify parametric forecast family
   family = str_split_1(list.files(path = paste0(fc_dir,"/"))[1], "_")[1]
   
@@ -52,9 +56,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_lnorm(values(target_rast), 
                                            values(param_tiffs$mu), 
                                            values(param_tiffs$sigma))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_lnorm(values(target_rast), 
                                            values(param_tiffs$mu), 
                                            values(param_tiffs$sigma))
+    logs_scores[mask] <- NA
   }
   
   if( family == "normal"){
@@ -71,9 +77,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_norm(values(target_rast), 
                                           values(param_tiffs$mu),
                                           values(param_tiffs$sigma))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_norm(values(target_rast), 
                                           values(param_tiffs$mu),
                                           values(param_tiffs$sigma))
+    logs_scores[mask] <- NA
   }
   
   if( family == "bernoulli"){
@@ -89,8 +97,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     
     crps_scores = scoringRules::crps_binom(values(target_rast), 
                                            values(param_tiffs$prob))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_binom(values(target_rast), 
                                            values(param_tiffs$prob))
+    logs_scores[mask] <- NA
   }
   
   if( family == "beta"){
@@ -107,9 +117,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_beta(values(target_rast), 
                                           values(param_tiffs$shape1),
                                           values(param_tiffs$shape2))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_beta(values(target_rast), 
                                           values(param_tiffs$shape1),
                                           values(param_tiffs$shape2))
+    logs_scores[mask] <- NA
   }
   
   if( family == "uniform"){
@@ -126,9 +138,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_unif(values(target_rast), 
                                           values(param_tiffs$min),
                                           values(param_tiffs$max))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_unif(values(target_rast), 
                                           values(param_tiffs$min),
                                           values(param_tiffs$max))
+    logs_scores[mask] <- NA
   }
   
   if( family == "gamma"){
@@ -145,9 +159,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_gamma(values(target_rast), 
                                            values(param_tiffs$shape),
                                            values(param_tiffs$rate))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_gamma(values(target_rast), 
                                            values(param_tiffs$shape),
                                            values(param_tiffs$rate))
+    logs_scores[mask] <- NA
   }
   
   if( family == "logistic"){
@@ -164,9 +180,11 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     crps_scores = scoringRules::crps_logis(values(target_rast), 
                                            values(param_tiffs$location),
                                            values(param_tiffs$scale))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_logis(values(target_rast), 
                                            values(param_tiffs$location),
                                            values(param_tiffs$scale))
+    logs_scores[mask] <- NA
   }
   
   if( family == "exponential"){
@@ -182,8 +200,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     
     crps_scores = scoringRules::crps_exp(values(target_rast), 
                                          values(param_tiffs$rate))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_exp(values(target_rast), 
                                          values(param_tiffs$rate))
+    logs_scores[mask] <- NA
   }
   
   if( family == "poisson"){
@@ -199,8 +219,10 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     
     crps_scores = scoringRules::crps_pois(values(target_rast), 
                                           values(param_tiffs$lambda))
+    crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_pois(values(target_rast), 
                                           values(param_tiffs$lambda))
+    logs_scores[mask] <- NA
   }
   
   
