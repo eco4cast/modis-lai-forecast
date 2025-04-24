@@ -101,6 +101,11 @@ parametric_scored_forecast_dir <- scoring_spat_parametric(fc_dir = parametric_fo
                                              target = target,
                                              scores_dir = 'scores_parametric')
 
+fc_mean <- rast('parametric/lognormal_mu_forecast.tif')
+plot(fc_mean, main = 'Forecast Mean')
+
+fc_sd <- rast('parametric/lognormal_sigma_forecast.tif')
+plot(fc_sd, main = 'Forecast SD')
 
 scores_crps <- rast('scores_parametric/crps_scores_parametric.tif')
 plot(scores_crps, main = 'CRPS Scores')
