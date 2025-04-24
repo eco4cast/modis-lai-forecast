@@ -80,10 +80,10 @@ climatology_scored_forecast_dir <- scoring_spat_ensemble(fc_dir = ensemble_forec
 Let's take a look at the performance of our climatology model.
 
 ```{r}
-scores_crps <- rast('scores/crps_scores.tif')
+scores_crps <- rast('scores_climatology/crps_scores.tif')
 plot(scores_crps, main = 'CRPS Scores')
 
-scores_logs <- rast('scores/logs_scores.tif')
+scores_logs <- rast('scores_climatology/logs_scores.tif')
 plot(scores_logs, main = 'Logarithmic Scores')
 ```
 
@@ -102,10 +102,10 @@ parametric_scored_forecast_dir <- scoring_spat_parametric(fc_dir = parametric_fo
                                              scores_dir = 'scores_parametric')
 
 
-scores_crps <- rast('scores/crps_scores_parametric.tif')
+scores_crps <- rast('scores_parametric/crps_scores_parametric.tif')
 plot(scores_crps, main = 'CRPS Scores')
 
-scores_logs <- rast('scores/logs_scores_parametric.tif')
+scores_logs <- rast('scores_parametric/logs_scores_parametric.tif')
 plot(scores_logs, main = 'Logarithmic Scores')
 
 ```
