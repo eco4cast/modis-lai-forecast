@@ -45,8 +45,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = paste0(fc_dir,"/")), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = paste0(fc_dir,"/"))[ind]))
     } 
     
     crps_scores = scoringRules::crps_lnorm(values(target_rast), 
@@ -64,8 +64,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_norm(values(target_rast), 
@@ -83,8 +83,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_binom(values(target_rast), 
@@ -100,8 +100,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_beta(values(target_rast), 
@@ -119,8 +119,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_unif(values(target_rast), 
@@ -138,8 +138,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_gamma(values(target_rast), 
@@ -157,8 +157,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_logis(values(target_rast), 
@@ -176,8 +176,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_exp(values(target_rast), 
@@ -193,8 +193,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
     names(param_tiffs) <- params
     # Make rasters for parameters by name
     for (i in 1:length(params)){
-      ind <- grep(x = list.files(path = fc_dir), pattern = params[i])
-      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",list.files(path = fc_dir)[ind]))
+      ind <- grep(x = dir_ls(path = fc_dir), pattern = params[i])
+      param_tiffs[[params[i]]] <- rast(paste0(fc_dir,"/",dir_ls(path = fc_dir)[ind]))
     } 
     
     crps_scores = scoringRules::crps_pois(values(target_rast), 
