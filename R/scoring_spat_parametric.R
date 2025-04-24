@@ -218,6 +218,9 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
                    crs = crs(target_rast)) %>% # Get cood system from parameter raster
     setValues(logs_scores)
   
+  ## check for scoring directory
+  dir.create(scores_dir, FALSE)
+  
   # Save scores into .tifs
   terra::writeRaster(crps_raster, 
                      filename = paste0(scores_dir, "/crps_scores_parametric.tif"),
