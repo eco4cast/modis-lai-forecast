@@ -67,11 +67,11 @@ for(i in subs_to_score){
   
   i = subs_to_score[1]
   model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
-  files <- mc_cp(i, "files/")
+  mc_cp(i, "files/")
   file_names <- mc_ls(i)
-  parametric_ind <- if_else(1 %in% str_detect(files, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
+  parametric_ind <- if_else(1 %in% str_detect(file_names, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
   if(parametric_ind == 1){
-    score_dir <- scoring_spat_parametric(i, target, "score_dir")
+    score_dir <- scoring_spat_parametric("files/", target, "score_dir")
     spat4cast_score_submit(score_dir, model_id)
   }else{
     
