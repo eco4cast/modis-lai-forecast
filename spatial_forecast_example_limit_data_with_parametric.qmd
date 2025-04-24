@@ -118,6 +118,6 @@ install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", 
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-mc_mirror("scores/", "efi/spat4cast-scores/lai_recovery/")
+mc_mirror("scores/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/")
 
 ```
