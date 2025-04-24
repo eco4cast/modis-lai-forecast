@@ -11,7 +11,7 @@
 #'
 #' @examples spat4cast_submit(dir = "climatology", model_id = "team1-climatology", variable = "lai_recovery", site_id = "august_complex")
 
-spat4cast_submit <- function(dir, 
+spat4cast_score_submit <- function(dir, 
                              model_id,
                              reference_date=Sys.Date(),
                              variable = c("lai_recovery"), 
