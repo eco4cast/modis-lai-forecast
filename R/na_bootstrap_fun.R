@@ -14,6 +14,6 @@ na_bootstrap_fun <- function(x){
   ## check if all x values are non-missing. return x if so
   if (all(!is.na(x))) return(x)
   ## if some values are missing, perform bootstrap resampling
-  x[is.na(x)] <- sample(x[!is.na(x)], size = length(x[is.na(x)]))
+  x[is.na(x)] <- sample(x[!is.na(x)], size = length(x[is.na(x)]), replace = TRUE)
   return(x)
 }
