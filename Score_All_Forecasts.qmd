@@ -94,14 +94,14 @@ for (j in scored){
   #dir <- str_sub(i, 1L, end = -2L)
   dir.create("files")
   mc_cp(j, "files", recursive = TRUE)
-  file_names <- mc_ls(i)
+  file_names <- mc_ls(j)
    
-  for( j in file_names){
-    if(str_detect(j, "crps") == TRUE){
-      temp_rast <- rast(paste0("files/",j))
+  for( i in file_names){
+    if(str_detect(i, "crps") == TRUE){
+      temp_rast <- rast(paste0("files/",i))
       plot(temp_rast, main = paste0("CRPS Score for", model_id,"-",ref_date))
     }else{
-      temp_rast <- rast(paste0("files/",j))
+      temp_rast <- rast(paste0("files/",i))
       plot(temp_rast, main = paste0("LOG Score for", model_id,"-",ref_date))
     }
   }
