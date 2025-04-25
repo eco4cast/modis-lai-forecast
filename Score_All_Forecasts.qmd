@@ -102,10 +102,10 @@ for (j in scored){
   for( i in file_names){
     if(str_detect(i, "crps") == TRUE){
       temp_rast <- rast(paste0("files/",i))
-      plot(temp_rast, main = paste0("CRPS Score for", model_id,"-",ref_date))
+      plot(temp_rast, main = paste0("CRPS Score for ", model_id,"-",ref_date))
     }else{
       temp_rast <- rast(paste0("files/",i))
-      plot(temp_rast, main = paste0("LOG Score for", model_id,"-",ref_date))
+      plot(temp_rast, main = paste0("LOG Score for ", model_id,"-",ref_date))
     }
   }
 }
