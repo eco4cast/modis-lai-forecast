@@ -27,7 +27,7 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   ## PURPOSE: spat_grid_ensemble takes a data matrix, target, and directory
   ## and generates a one-step-ahead arima forecast for each grid.
   ## This is an parametric forecasting method, and saves the parameters as
-  ## geotiff files in the specified directory
+  ## a two layer geotiff file in the specified directory
   ## INPUTS: 
   ## data_csv - csv containing data for grid cells. rows are time and 
   ## columns are gridcells. 
@@ -67,25 +67,25 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
       forecast_sds[i] <- NA
     }
   }
+  # Make means and sds into a matrix
+  fc_mat <- matrix(c(forecast_means, forecast_sds), ncol = 2)
   
   ## convert parameters to raster
-  forecast_sigmas <- target_rast
-  forecast_mu <- target_rast
-  values(forecast_mu) <- matrix(forecast_means, ncol = 1)
-  values(forecast_sigmas) <- matrix(forecast_sds, ncol = 1)
+  
+  fc_rast <- 
+    terra::rast(ext(target_rast), # Get dimensions from parameter raster
+              res = res(target_rast), # Get res from parameter raster
+              crs = crs(target_rast),
+              nlyr = 2) %>% # Get cood system from parameter raster
+    setValues(fc_mat[,c("forecast_means", "forecast_sds")]) %>%
+    set.names(c("mu", "sigma"), index = 1:2)
   
   ## check for scoring directory
   dir.create(dir, FALSE)
   
-  terra::writeRaster(forecast_mu, 
-                     filename = paste0(dir,"/lognormal_mu_forecast.tif"),
+  terra::writeRaster(fc_rast, 
+                     filename = paste0(dir,"/lognormal_forecast.tif"),
                      overwrite = TRUE)
-  
-  terra::writeRaster(forecast_sigmas, 
-                     filename = paste0(dir,"/lognormal_sigma_forecast.tif"),
-                     overwrite = TRUE)
-  
-  
   
   return(dir)
 }

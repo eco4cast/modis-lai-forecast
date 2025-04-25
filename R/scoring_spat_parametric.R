@@ -39,6 +39,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   y <- as.vector(values(target_rast))
   mask <- is.na(y)
   
+  if(length(list.files(paste0(fc_dir,"/"))) > 1){
+  
   # identify parametric forecast family
   family = str_split_1(list.files(paste0(fc_dir,"/"))[1], "_")[1]
   
@@ -226,34 +228,55 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   }
   
   
-  # Make raster for crps scores
-  crps_raster <- 
-    terra::rast(ext(target_rast), # Get dimensions from parameter raster
-                   res = res(target_rast), # Get res from parameter raster
-                   crs = crs(target_rast)) %>% # Get cood system from parameter raster
-    setValues(crps_scores)
   
-  # Make raster for log scores
-  logs_raster <- 
-    terra::rast(ext(target_rast), # Get dimensions from parameter raster
-                   res = res(target_rast), # Get res from parameter raster
-                   crs = crs(target_rast)) %>% # Get cood system from parameter raster
-    setValues(logs_scores)
+  }
+}else{
   
-  ## check for scoring directory
-  dir.create(scores_dir, FALSE)
+  # identify parametric forecast family
+  family = str_split_1(list.files(paste0(fc_dir,"/"))[1], "_")[1]
   
-  # Save scores into .tifs
-  terra::writeRaster(crps_raster, 
-                     filename = paste0(scores_dir, "/crps_scores_parametric.tif"),
-                     overwrite=TRUE)
-  terra::writeRaster(logs_raster, 
-                     filename = paste0(scores_dir, '/logs_scores_parametric.tif'),
-                     overwrite=TRUE)
+  if( family == "lognormal"){
+    # parameters for lognormal distribution
+    params = c("mu", "sigma")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,"mu"], 
+                                           values(fc_rast)[,"sigma"])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,"mu"], 
+                                           values(fc_rast)[,"sigma"])
+    logs_scores[mask] <- NA
+  }
   
-  
-  return(scores_dir) 
 }
 
+# Make raster for crps scores
+crps_raster <- 
+  terra::rast(ext(target_rast), # Get dimensions from parameter raster
+              res = res(target_rast), # Get res from parameter raster
+              crs = crs(target_rast)) %>% # Get cood system from parameter raster
+  setValues(crps_scores)
 
+# Make raster for log scores
+logs_raster <- 
+  terra::rast(ext(target_rast), # Get dimensions from parameter raster
+              res = res(target_rast), # Get res from parameter raster
+              crs = crs(target_rast)) %>% # Get cood system from parameter raster
+  setValues(logs_scores)
+
+## check for scoring directory
+dir.create(scores_dir, FALSE)
+
+# Save scores into .tifs
+terra::writeRaster(crps_raster, 
+                   filename = paste0(scores_dir, "/crps_scores_parametric.tif"),
+                   overwrite=TRUE)
+terra::writeRaster(logs_raster, 
+                   filename = paste0(scores_dir, '/logs_scores_parametric.tif'),
+                   overwrite=TRUE)
+
+
+return(scores_dir) 
 
