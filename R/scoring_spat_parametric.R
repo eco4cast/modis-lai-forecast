@@ -229,8 +229,8 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   
   
   
-  }
-}else{
+}
+else{
   
   # identify parametric forecast family
   family = str_split_1(list.files(paste0(fc_dir,"/"))[1], "_")[1]
@@ -249,7 +249,6 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
                                            values(fc_rast)[,"sigma"])
     logs_scores[mask] <- NA
   }
-  
 }
 
 # Make raster for crps scores
@@ -280,3 +279,4 @@ terra::writeRaster(logs_raster,
 
 return(scores_dir) 
 
+}
