@@ -65,6 +65,8 @@ for (i in submitted){
   
 }
 
+print(subs_to_score)
+
 for(i in subs_to_score){
   model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
   ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
