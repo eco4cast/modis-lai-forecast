@@ -57,9 +57,9 @@ scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
 
 subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
-subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
 
 if(length(subs_to_score) > 0){
+subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
   for(i in subs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
