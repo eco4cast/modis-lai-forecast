@@ -70,7 +70,7 @@ for(i in subs_to_score){
   ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
   #dir <- str_sub(i, 1L, end = -2L)
   dir.create("files")
-  mc_cp(i, "files")
+  mc_cp(i, "files", recursive = TRUE)
   
   file_names <- mc_ls(i)
   parametric_ind <- if_else(1 %in% str_detect(file_names, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
