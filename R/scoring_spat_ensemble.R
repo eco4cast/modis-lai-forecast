@@ -36,7 +36,7 @@ scoring_spat_ensemble <- function(fc_dir, target, scores_dir){
   target_rast <- rast(target, vsi=TRUE)
   
   ## read in forecast as raster
-  fc <- rast(paste0(fc_dir, "/", list.files(paste0(fc_dir, '/'))))
+  fc <- rast(paste0(fc_dir, "/", dir_ls(paste0(fc_dir, '/'))))
   
   ## create vector of observations from target rast
   y <- as.vector(values(target_rast))
