@@ -56,7 +56,8 @@ scoring_spat_ensemble <- function(fc_dir, target, scores_dir){
   logs_ensemble[mask] <- NA
   
   ## convert scores to raster
-  crps_scores <- logs_scores <- target_rast
+  crps_scores <- target_rast
+  logs_scores <- target_rast
   values(crps_scores) <- matrix(crps_ensemble, ncol = 1)
   values(logs_scores) <- matrix(logs_ensemble, ncol = 1)
   
