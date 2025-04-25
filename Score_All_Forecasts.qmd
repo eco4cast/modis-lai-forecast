@@ -1,6 +1,9 @@
 ---
 title: "Apply Scores to Forecasts"
-format: html
+author: "Will"
+format:
+  html:
+    embed-resources: TRUE
 editor: visual
 ---
 

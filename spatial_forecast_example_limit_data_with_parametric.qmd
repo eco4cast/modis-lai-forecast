@@ -1,6 +1,6 @@
 ---
 title: "spatial_forecast_example"
-author: "John, David, Emma, Carl"
+author: "John, David, Emma, Carl, Will"
 format:
   html:
     embed-resources: TRUE
