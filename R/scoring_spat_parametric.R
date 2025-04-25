@@ -241,12 +241,126 @@ else{
     fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
     
     crps_scores = scoringRules::crps_lnorm(values(target_rast), 
-                                           values(fc_rast)[,"mu"], 
-                                           values(fc_rast)[,"sigma"])
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
     crps_scores[mask] <- NA
     logs_scores = scoringRules::logs_lnorm(values(target_rast), 
-                                           values(fc_rast)[,"mu"], 
-                                           values(fc_rast)[,"sigma"])
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "normal"){
+    # parameters for normal distribution
+    params = c("mu", "sigma")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "bernoulli"){
+    # parameters for bernoulli distribution
+    params = c("prob")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "beta"){
+    # parameters for beta distribution
+    params = c("shape1", "shape2")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "uniform"){
+    # parameters for uniform distribution
+    params = c("min", "max")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "gamma"){
+    # parameters for gamma distribution
+    params = c("shape", "rate")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "logistic"){
+    # parameters for logistic distribution
+    params = c("location", "scale")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]], 
+                                           values(fc_rast)[,params[2]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "exponential"){
+    # parameters for exponential distribution
+    params = c("rate")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
+    logs_scores[mask] <- NA
+  }
+  
+  if( family == "poisson"){
+    # parameters for poisson distribution
+    params = c("lambda")
+    fc_rast <- rast(paste0(fc_dir,"/",list.files(path = paste0(fc_dir,"/"))))
+    
+    crps_scores = scoringRules::crps_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
+    crps_scores[mask] <- NA
+    logs_scores = scoringRules::logs_lnorm(values(target_rast), 
+                                           values(fc_rast)[,params[1]])
     logs_scores[mask] <- NA
   }
 }
