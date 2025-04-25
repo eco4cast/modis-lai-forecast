@@ -86,7 +86,7 @@ for(i in subs_to_score){
   model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
   ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
   #dir <- str_sub(i, 1L, end = -2L)
-  # dir.create("files")
+  dir.create("files")
   mc_cp(i, "files", recursive = TRUE)
 
   file_names <- mc_ls(i)
