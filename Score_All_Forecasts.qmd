@@ -80,7 +80,7 @@ print(subs_to_score)
 # }
 # 
 
-subs_to_score <- paste0(subs_to_score,"/")
+# subs_to_score <- paste0(subs_to_score,"/")
 
 for(i in subs_to_score){
   model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
