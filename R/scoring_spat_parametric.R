@@ -40,7 +40,7 @@ scoring_spat_parametric <- function(fc_dir, target, scores_dir){
   mask <- is.na(y)
   
   # identify parametric forecast family
-  family = str_split_1(list.files(path = paste0(fc_dir,"/"))[1], "_")[1]
+  family = str_split_1(mc_ls(paste0(fc_dir,"/"))[1], "_")[1]
   
   if( family == "lognormal"){
     # parameters for lognormal distribution
