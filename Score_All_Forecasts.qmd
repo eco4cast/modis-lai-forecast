@@ -77,7 +77,7 @@ if(length(subs_to_score) > 0){
       spat4cast_score_submit(score_dir, model_id, reference_date = ref_date)
     }
   }
-}
+}else{}
 
 ```
 
@@ -106,5 +106,13 @@ for (i in scored){
     }
   }
 }
+
+
+A <- c("A", "B", "C")
+B <- c("A", "B", "C")
+
+a <- A[which(A %in% B == 0)]
+
+
 
 ```
