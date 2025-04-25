@@ -77,8 +77,8 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
               res = res(target_rast), # Get res from parameter raster
               crs = crs(target_rast),
               nlyr = 2) %>% # Get cood system from parameter raster
-    setValues(fc_mat[,c("forecast_means", "forecast_sds")]) %>%
-    set.names(c("mu", "sigma"), index = 1:2)
+    setValues(fc_mat[,c("forecast_means", "forecast_sds")])
+    set.names(fc_rast, c("mu", "sigma"), index = 1:2)
   
   ## check for scoring directory
   dir.create(dir, FALSE)
