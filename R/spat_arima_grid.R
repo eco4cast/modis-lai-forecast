@@ -68,7 +68,7 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
     }
   }
   # Make means and sds into a matrix
-  fc_mat <- matrix(c(forecast_means, forecast_sds), ncol = 2)
+  fc_mat <- cbind(forecast_means, forecast_sds)
   
   ## convert parameters to raster
   
