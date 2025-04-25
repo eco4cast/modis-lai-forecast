@@ -87,7 +87,7 @@ subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id
 scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
 
 scored <- unique(str_extract(scored, ".*/reference_date=.*/"))
-
+scored <- paste0("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", scored)
 for (j in scored){
   model_id <- str_extract(j, "(?<=model_id=).*(?=/reference_date=)")
   ref_date <- str_extract(j, "(?<=reference_date=).*(?=/)" )
