@@ -57,29 +57,6 @@ scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
 
 subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
-print(submitted)
-
-print(scored)
-
-print(subs_to_score)
-
-# subs_to_score <- list()
-
-# for(j in 1:length(submitted)){
-#   for (i in submitted){
-#     # Get the reference dates for which there have been submissions
-#     submitted_ref_dates <- mc_ls(paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i))
-#     # Get the reference dates for which there have been scores
-#     scored_ref_dates <- mc_ls(paste0("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", scored))
-#     # Get the reference dates which haven't been scored
-#     ref_dates_to_score <- submitted_ref_dates[which(submitted_ref_dates %in% scored_ref_dates == 0)]
-#     # add the reference date files to a list of submissions that need to be scored.
-#     subs_to_score <- append(subs_to_score, paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", i,  ref_dates_to_score))
-#     
-#   }
-# }
-# 
-
 subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
 
 for(i in subs_to_score){
@@ -99,8 +76,34 @@ for(i in subs_to_score){
     spat4cast_score_submit(score_dir, model_id, reference_date = ref_date)
 
   }
-  # print(parametric_ind)
-  # print(file_names)
+}
+
+```
+
+## Lets Get visualizations of each of the scored forecasts
+
+```{r}
+scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+
+scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
+
+for (i in scored){
+  model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
+  ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
+  #dir <- str_sub(i, 1L, end = -2L)
+  dir.create("files")
+  mc_cp(i, "files", recursive = TRUE)
+  file_names <- mc_ls(i)
+   
+  for( j in file_names){
+    if(str_detect(j, "crps") == TRUE){
+      temp_rast <- rast(paste0("files/",j))
+      plot(temp_rast, main = paste0("CRPS Score for", model_id,"-",ref_date))
+    }else{
+      temp_rast <- rast(paste0("files/",j))
+      plot(temp_rast, main = paste0("LOG Score for", model_id,"-",ref_date))
+    }
+  }
 }
 
 ```
