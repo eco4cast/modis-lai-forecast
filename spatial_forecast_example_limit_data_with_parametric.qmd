@@ -39,6 +39,11 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      dt = "P30D",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
+
+write_tif(raster_cube, "time_series_cube.tif")
+
+mc_mirror("time_series_cube.tif", "efi/scores_data/")
+
 ```
 
 Next, we want to generate and store a target file to evaluate our (eventual) forecast. We can do this using the function `create_target_file().`
