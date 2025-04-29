@@ -197,16 +197,60 @@ hist(dat, breaks = 200, ylim = c(0, 2),
      main = 'Histogram of 20 Data Points')
 ```
 
-In fact these singleton data points *are* our statistical model, at least after a little bit of work.
+In fact these singleton data points *are* our statistical model, at least after a little bit of work. We put some little densities around them (sometimes called "kernel dressing" in the literature) and these little densities come together to turn these singleton points into a forecast distribution. Taking our example from above, this process yields the following:
 
 ```{r}
 plot(density(dat))
 ```
 
-By choosing to "fit" a non-parametric model we are flexible COME BACK. If we were to just take a mean and standard deviation of the above data and treat it as a univariate Normal distribution we would be missing out on the fact that our data is actually bimodal with two areas of high density.
+By choosing to "fit" a non-parametric model to our data we get some additional flexibility, since we don't have to conform to some particular pre-specified probability distribution. For example, if we were to just take a mean and standard deviation of the above data and treat it as a univariate Normal distribution we would be missing out on the fact that our data is actually bimodal with two areas of high density.
 
-In many situations, the climatology or local climatology models perform surprisingly well. To paraphrase Benjamin Franklin: "death, taxes, and losing to the climatology". Post fire LAI recovery presents an interesting challenge for historical climatology data however: sites that not previously had a fire during the MODIS period from 2002 to present may not adequately capture the recovery.
+In many situations, the climatology or local climatology models perform surprisingly well. To paraphrase Benjamin Franklin: "death, taxes, and losing to the climatology". Post fire LAI recovery presents an interesting challenge for historical climatology data however: sites that not previously had a fire during the MODIS period from 2002 to present may not adequately capture the behavior of LAI during post fire-recovery. 
 
+Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
+
+```{r, echo = FALSE}
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+library(tidyverse)
+suppressPackageStartupMessages(source("../packages.R"))
+```
+
+```{r}
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
+```
+
+```{r}
+# Ingest data ------------------------------------------------------------
+gdalcubes::gdalcubes_options(parallel=TRUE)
+
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
+raster_cube <- ingest_planetary_data(start_date = "2002-01-01", 
+                                     end_date = "2025-03-01", 
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1, 
+                                     dy = 0.1, 
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+# create target file
+date <- '2023-06-01'
+target <- create_target_file(cuberast = raster_cube,
+                             date = date,
+                             dir = "/vsis3/spat4cast-targets",
+                             mask = fire_box$maskLayer)
+```
+
+```{r}
+# Forecast ----------------------------------------------------------------
+
+ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
+                                          date = '2023-06-01',
+                                          dir = 'climatology')
+
+ensemble_forecast_dir |>
+  spat4cast_submit()
+```
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
 
@@ -234,6 +278,8 @@ Does this forecast seem reasonable?
 -   Which model(s) did best?
 -   What might explain the differences in scores between the different
     models?
+    
+## 4.3 Improving your forecasts: Incorporating additional data
 
 # 5 What’s next?
 
