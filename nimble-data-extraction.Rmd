@@ -1,0 +1,115 @@
+---
+title: "nimble data extraction"
+author: "JW Smith"
+date: "2023-11-15"
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introduction
+The creation of this document was motivated by the need to extract spatio-temporal MODIS LAI data for the NEON Spatial Forecasting challenge. The infrastructure for pulling data to fit the climatology model already exists, but is a different process than what we need to fit the spatio-temporal random walk model (STRW hereafter). The STRW model is implemented in `nimble`, which uses compact storage for spatial models (see https://r-nimble.org/html_manual/cha-spatial.html). Working with and extracting spatial data is a process that I am relatively unfamiliar with, and this was my attempt at a solution. This code is likely to be inefficient, and this document is being created to share the code with others so that it can be refined. 
+## Section 1: Ingesting data from the planetary computer
+The first part of the process is familiar, and involves reading in data using the `ingest_planetary_data()` function from the `modis-lai-forecast` repository. The code to do this is given below:
+```{r, eval = FALSE}
+## read in fire bounding box
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
+## turn parallelization on
+gdalcubes::gdalcubes_options(parallel=TRUE)
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
+raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
+                                     end_date = "2023-07-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+## extract dimension values of raster cube
+d <- gdalcubes::dimension_values(raster_cube)
+```
+## Section 2: Formatting the data into a matrix
+As mentioned earlier, `nimble` does not want an array for the spatio-temporal data. Instead, it wants a matrix that has spatial encoding in the rows. Not particularly relevant for the optimization of the code, but it achieves this by storing information about neighbors using `as.carAdjacency()`. The goal of **Section 2** was to extract the gridded MODIS LAI values for a particular time $t$ and store them as the rows of a matrix, ordered by time. I tried a great number of things in this section, including using `extract_geom()` from the `gdalcubes` library. At first, this appeared to work well, but there were mismatches between the $x$ and $y$ dimensions that the data is pulled at using `ingest_planetary_data()` and the corresponding output from `extract_geom()`. This is when I read the following line in the `extract_geom()` documentation: "Pixels with missing values are automatically dropped from the result. It is hence not guaranteed that the result will contain rows for all input features". Indeed, the missing values were being dropped from the result but there was not any indicator of which of the grid cells were being dropped. This made it very difficult to verify that the data being pulled was being stored in the matrix correctly. 
+As a compromise, I decided to write my own function, shown below.
+```{r, eval = FALSE}
+## function to extract nimble matrix
+extract_nimble_matrix <- function(cube, d, threshold = 12, dir = '../GeoTiffs/'){
+  ## extract_nimble_matrix
+  ## Author: John W. Smith
+  ## Inputs:
+  ## cube: rastercube object to extract values from
+  ## d: dimension value object for rastercube 'cube'
+  ## threshold: numeric, upper bounds for LAI. values above threshold are discarded
+  ## dir: character, directory to write temporary GeoTiff files to
+  
+  ## Outputs:
+  ## nimble_mat: matrix of LAI values indexed by time to be
+  ## passed to nimble to fit the baseline spatio-temporal
+  ## random walk model.
+  
+  ## initialize nimnble_mat using information from d object
+  nimble_mat <- matrix(NA, nrow = length(d$t), 
+                       ncol = length(d$x)*length(d$y))
+  ## loop through time indices of d
+  for (i in 1:length(d$t)){
+    ## slice cube at time i and write GeoTiff file
+    cube %>% gdalcubes::select_time(d$t[i]) %>% write_tif(dir = dir, prefix = 'tmp')
+    ## recreate filename
+    filename <- paste0(dir, 'tmp', d$t[i], '.tif')
+    ## read in file as raster
+    tmp_rast <- rast(filename, vsi = TRUE)
+    ## extract values from raster
+    tmp_values <- as.vector(terra::values(tmp_rast))
+    ## subset values using threshold
+    tmp_values[tmp_values > threshold] <- NA
+    ## write i-th row of nimble matrix using raster values
+    nimble_mat[i,] <- tmp_values
+    ## remove temporary GeoTiff file
+    if (paste0('tmp', d$t[i], '.tif') %in% list.files(dir)) file.remove(filename)
+  }
+  return(nimble_mat)
+}
+```
+This is, most likely, a highly inefficient way to grab the data and store it into a matrix. But, my primary objective was to pull the data and fit the STRW model and assess the fit and convergence, so I decided to just run with it. The function using the dimension values from the `rasterCube` object, and iterates along them and writes each time point as a temporary GeoTiff. It then extracts the values from the GeoTiff, stores them in the matrix, and deletes the temporary file to save space. 
+This works in theory, but in practice I ran into a number of problems. The function takes quite a long time to run, and (I believe that) it loses connection after roughly 60 minutes. When I ran the following code:
+```{r, eval = FALSE}
+nimble_spat_data <- extract_nimble_matrix(cube = raster_cube, d = d)
+```
+The second half of the data was all read in as `NaN`. To ameliorate this, I extracted the rows one-at-a-time. If any `NaN` values were found as a row was being extracted, the data was re-pulled using `ingest_planetary_data()`. This worked, but again, I suspect that it is inefficient. The code is below:
+```{r, eval = FALSE}
+## set dv value
+dv <- d
+dv$t <- d$t[1]
+## extract first row
+nimble_mat <- extract_nimble_matrix(raster_cube, dv)
+## iterate through d$t
+for (i in 2:length(d$t)){
+  dv$t <- d$t[i]
+  ## extract corresponding row
+  nm_row <- extract_nimble_matrix(raster_cube, dv)
+  if (any(is.nan(nm_row))){
+    ## if any NaN are read in, re-pull raster cube
+    print('Rebooting connection to planetary computer')
+    raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
+                                         end_date = "2023-07-01",
+                                         box = fire_box$bbox,
+                                         srs = "EPSG:4326",
+                                         dx = 0.1,
+                                         dy = 0.1,
+                                         dt = "P30D",
+                                         collection = "modis-15A2H-061",
+                                         asset_name = "Lai_500m")
+    ## try again
+    nm_row <- extract_nimble_matrix(raster_cube, dv)
+    ## bind row to matrix 
+    nimble_mat <- rbind(nimble_mat, nm_row)
+  } else{
+    ## bind row to matrix
+    nimble_mat <- rbind(nimble_mat, nm_row)
+  }
+}
+```
+This allowed me to extract the data in the format that I need it, and I have it saved as a `.csv` for testing purposes. There has to be a better way, though.

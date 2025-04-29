@@ -30,7 +30,7 @@ Optionally, we can also specify the desired spatial and temporal resolution for 
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2019-01-01", 
+raster_cube <- ingest_planetary_data(start_date = "2002-01-01", 
                                      end_date = "2023-07-01", 
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
