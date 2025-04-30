@@ -41,7 +41,7 @@ mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 
 dir.create("files")
 
-mc_cp("efi/spat4cast-data/", "files", recursive = TRUE)
+mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
 
 cube <- ncdf_cube("files/time_series_cube.nc")
 
