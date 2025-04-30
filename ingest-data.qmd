@@ -19,7 +19,7 @@ fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
 ## turn parallelization on
 gdalcubes::gdalcubes_options(parallel=TRUE)
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
+raster_cube <- ingest_planetary_data(start_date = "2023-01-01",
                                      end_date = "2023-07-01",
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
@@ -46,7 +46,7 @@ mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
 
 cube <- ncdf_cube("files/time_series_cube.nc")
 
-plot.cube(cube)
+plot(cube)
 
 
 ```
