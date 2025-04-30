@@ -35,7 +35,7 @@ mc_alias_set("efi", "data.ecoforecast.org",
 
 dir.create("cube")
 
-write_ncdf(raster_cube, dir = "cube", prefix = "time_series_cube")
+write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
 mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 ```
