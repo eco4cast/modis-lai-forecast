@@ -33,9 +33,9 @@ d <- gdalcubes::dimension_values(raster_cube)
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-dir.create("temp")
+dir.create("cube")
 
-write_tif(raster_cube, dir = "temp", prefix = "time_series_cube")
+write_ncdf(raster_cube, dir = "cube", prefix = "time_series_cube")
 
-mc_cp("temp", "efi/spat4cast-submissions/", recursive = TRUE)
+mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 ```
