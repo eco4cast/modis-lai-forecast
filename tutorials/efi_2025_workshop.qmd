@@ -219,7 +219,7 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r}
+```{r, eval = F}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
@@ -241,7 +241,7 @@ target <- create_target_file(cuberast = raster_cube,
                              mask = fire_box$maskLayer)
 ```
 
-```{r}
+```{r, eval = F}
 # Forecast ----------------------------------------------------------------
 
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
@@ -265,7 +265,7 @@ Does this forecast seem reasonable?
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
 
-```
+
 
 # 4 Evaluating your forecast
 
@@ -280,6 +280,14 @@ Does this forecast seem reasonable?
     models?
     
 ## 4.3 Improving your forecasts: Incorporating additional data
+
+An obvious choice for improving on the baseline models presented here is to incorporate covariate information into our forecasts of LAI. Three of our focal fires occurred at NEON sites. This means that we have access to a wealth of covariate information, if we are able to access it and process it! In this section, we provide example code that uses the `neonstore` package to pull and aggregate NEON data for:
+
+- Temperature (daily minimum and maximum temperature)
+- Incoming shortwave radiation (daily)
+- Relative humidity (daily)
+
+In order to avoid any potential package and dependecy related issues with the installation of `neonstore`, we provide all of the example data from this section in a `.csv` file format on the bucket, so that participants can immediately jump into model building. 
 
 # 5 What’s next?
 
