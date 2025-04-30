@@ -10,6 +10,7 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(minioclient) # remotes::install_github("cboettig/minioclient")
 install_mc()
+library(gdalcubes)
 ```
 
 ```{r}
