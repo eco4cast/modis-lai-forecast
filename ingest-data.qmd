@@ -46,7 +46,7 @@ mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
 
 cube <- ncdf_cube("files/time_series_cube.nc")
 
-gdalcubes::plot.cube(cube)
+plot.cube(cube)
 
 
 ```
