@@ -219,7 +219,7 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r}
+```{r, eval = F}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
@@ -241,7 +241,7 @@ target <- create_target_file(cuberast = raster_cube,
                              mask = fire_box$maskLayer)
 ```
 
-```{r}
+```{r, eval = F}
 # Forecast ----------------------------------------------------------------
 
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
@@ -254,9 +254,11 @@ ensemble_forecast_dir |>
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
 
-The Grid ARIMA baseline model considers each grid cell in the fire polygon
+The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
 
-It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, yada yada talk about other two models and explain that this one is meant to be simple.
+The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ and their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
+
+It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
 
 
 
@@ -265,7 +267,7 @@ Does this forecast seem reasonable?
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
 
-```
+
 
 # 4 Evaluating your forecast
 
@@ -280,6 +282,65 @@ Does this forecast seem reasonable?
     models?
     
 ## 4.3 Improving your forecasts: Incorporating additional data
+
+An obvious choice for improving on the baseline models presented here is to incorporate covariate information into our forecasts of LAI. Three of our focal fires occurred at NEON sites. This means that we have access to a wealth of covariate information, if we are able to access it and process it! In this section, we provide example code that uses the `neonstore` package to pull and aggregate NEON data for:
+
+- Temperature (daily minimum and maximum temperature)
+- Incoming shortwave radiation (daily)
+- Relative humidity (daily)
+
+In order to avoid any potential package and dependecy related issues with the installation of `neonstore`, we provide all of the example data from this section in a `.csv` file format on the bucket, so that participants can immediately jump into model building. This process can be roughly broken down into four steps:
+
+- Identifying your site of interest
+- Finding and accessing a data product for your covariate of interest
+- Aggregating data to the desired time scale
+- (Optional) Imputing missing data
+
+```{r, eval = FALSE}
+## set site to desired NEON site
+## here we will use SOAP, but the other focal
+## sites can be used (GRSM or SRER)
+site <- 'SOAP'
+```
+
+The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found here: https://data.neonscience.org/) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
+
+```{r, eval = F}
+## air temp data product
+air_temp_dp <- 'DP1.00003.001'
+
+## use neonstore package "neon_download" function to pull data product
+## for triple aspirated air temperature
+neon_download(product = air_temp_dp, site = site)
+```
+
+```{r, eval = FALSE}
+## read the 30 minute measurements into temp_table
+temp_table <- neon_read("TAAT_30min-basic", site = site)
+
+## create table of minimum and maximum temps
+temp_info <- temp_table %>%
+  ## use lubridate to extract date format
+  mutate(Date = as_date(endDateTime)) %>%
+  ## group_by date to get daily mins/maxs
+  group_by(Date) %>%
+  ## compute minimums and maximums
+  summarize(MinT_daily = min(tempTripleMinimum, na.rm = TRUE),
+            MaxT_daily = max(tempTripleMaximum, na.rm = TRUE)) %>%
+  ## change infinite values to NAs for interpolation
+  mutate_if(is.numeric, ~
+              replace(., is.infinite(.), NA))
+```
+
+The optional fourth step is imputation of missing data. 
+
+```{r, eval = FALSE}
+library(imputeTS) ## for na_kalman
+
+## interpolate missing temperature values using a kalman filter
+temp_info$MinTInterp <- na_kalman(temp_info$MinT_daily)
+temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
+```
 
 # 5 What’s next?
 
