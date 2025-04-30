@@ -4,23 +4,38 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{r message = FALSE}
+knitr::opts_chunk$set(message=FALSE, warning = FALSE)
+suppressPackageStartupMessages(source("packages.R"))
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+library(minioclient) # remotes::install_github("cboettig/minioclient")
+install_mc()
 ```
 
-You can add options to executable code like this
-
 ```{r}
-#| echo: false
-2 * 2
-```
+## read in fire bounding box
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
+## turn parallelization on
+gdalcubes::gdalcubes_options(parallel=TRUE)
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
+raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
+                                     end_date = "2023-07-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+## extract dimension values of raster cube
+d <- gdalcubes::dimension_values(raster_cube)
 
-The `echo: false` option disables the printing of code (only output is displayed).
+mc_alias_set("efi", "data.ecoforecast.org",
+             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+
+dir.create("temp")
+
+write_tif(raster_cube, dir = "temp", prefix = "time_series_cube")
+
+mc_mirror("temp", "efi/spat4cast-submissions/data/", verbose = TRUE)
+```
