@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 -   Overview of the [Post Fire Recovery - MODIS LAI](https://projects.ecoforecast.org/neon4cast-docs/)#to do replace with actual forecast link
     theme for the [NEON Ecological Forecast
     Challenge](https://projects.ecoforecast.org/neon4cast-ci/)
--   How to download the necessary data from Planentary Computer
+-   How to download the necessary data from Planetary Computer
 -   How to create a simple forecast for the Post Fire Recovery theme
 -   How to submit/score a forecast to evaluate its accuracy
 
@@ -41,7 +41,7 @@ Ecological Forecasting challenge.
 
 ## 1.3 Things you will need to complete this tutorial
 
-You will need a current version of R (v4.2 or newer) to complete this
+You will need a current version of R (v4.4 or newer) to complete this
 tutorial. We also recommend the RStudio IDE to work with R.
 
 To complete the workshop via this markdown document the following
@@ -69,11 +69,18 @@ The following code chunk should be run to install packages.
 ``` r
 install.packages('tidyverse') # collection of R packages for data manipulation, analysis, and visualisation
 install.packages('lubridate') # working with dates and times
-install.packages('tsibble') # working with timeseries data
-install.packages('fable') # running forecasts
-install.packages('fabletools') # helper functions for using fable
+install.packages('stars') 
+install.packages('gdalcubes') 
+install.packages('rstac') 
+install.packages('terra')
+install.packages('scoringRules') # package to score forecasts
+install.packages('forecas')
+install.packages('nimble')
+install.packages('spatstat.sparse')
+install.packages('assertthat')
+install.packages('minioclient')
+install.packages('purrr')
 install.packages('remotes')
-install.packages('tsibble') # package for dealing with time series data sets and tsibble objects
 remotes::install_github('eco4cast/neon4cast') # package from NEON4cast challenge organisers to assist with forecast building and submission
 remotes::install_github("eco4cast/score4cast") # package to score forecasts
 ```
@@ -90,10 +97,19 @@ version$version.string
 library(tidyverse)
 library(lubridate)
 library(tsibble)
-library(fable)
-library(fabletools)
+library(stars)
+library(gdalcubes)
+library(rstac)
+library(terra)
+library(scoringRules)
+library(forecast)
+library(nimble)
+library(spatstat.sparse)
+library(assertthat)
+library(minioclient)
+library(purrr)
+library(remotes)
 library(neon4cast)
-library(score4cast)
 ```
 
 # 2 Introduction
@@ -124,7 +140,7 @@ about how you can participate
 
 ## 2.2 Goals for forecasts of post fire recovery
 
-
+Ecologist are interested in tracking how ecosystems recover from disturbances. 
 
 ## 2.3 Overview of the [MODIS LAI Post Fire Recovery](https://projects.ecoforecast.org/neon4cast-docs/) theme
 
