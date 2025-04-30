@@ -40,9 +40,9 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
 
-write_tif(raster_cube, "time_series_cube.tif")
+write_tif(raster_cube, dir = 'temp', prefix = "time_series_cube")
 
-mc_mirror("time_series_cube.tif", "efi/spat4cast-data/")
+mc_mirror("temp", "efi/spat4cast-data/")
 
 ```
 
