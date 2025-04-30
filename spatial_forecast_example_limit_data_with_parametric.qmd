@@ -42,7 +42,7 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
 
 write_tif(raster_cube, dir = 'temp', prefix = "time_series_cube")
 
-mc_mirror("temp", "efi/spat4cast-data/")
+mc_cp("temp/", "efi/spat4cast-data/", recursive = TRUE)
 
 ```
 
