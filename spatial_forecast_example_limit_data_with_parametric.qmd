@@ -44,7 +44,7 @@ dir.create("temp")
 
 write_tif(raster_cube, dir = "temp", prefix = "time_series_cube")
 
-mc_cp("temp", "efi/spat4cast-submissions/", recursive = TRUE, verbose = TRUE)
+mc_mirror("temp", "efi/spat4cast-submissions/data/", verbose = TRUE)
 
 ```
 
