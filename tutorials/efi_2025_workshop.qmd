@@ -219,12 +219,12 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r, eval = F}
+```{r, eval = T}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2002-01-01", 
+raster_cube <- ingest_planetary_data(start_date = "2015-01-01", 
                                      end_date = "2025-03-01", 
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
@@ -233,23 +233,20 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      dt = "P30D",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
-# create target file
-date <- '2023-06-01'
-target <- create_target_file(cuberast = raster_cube,
-                             date = date,
-                             dir = "/vsis3/spat4cast-targets",
-                             mask = fire_box$maskLayer)
 ```
 
-```{r, eval = F}
+```{r, include=FALSE}
 # Forecast ----------------------------------------------------------------
-
+library(minioclient)
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
-                                          date = '2023-06-01',
+                                          date = '2025-03-01',
                                           dir = 'climatology')
 
+install_mc()
+mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
+
 ensemble_forecast_dir |>
-  spat4cast_submit()
+  spat4cast_submit(model_id = 'johnsmith')
 ```
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
