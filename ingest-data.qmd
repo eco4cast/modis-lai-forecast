@@ -1,6 +1,8 @@
 ---
 title: "Ingest_Data"
-format: html
+format:
+  html:
+    embed-resources: TRUE
 editor: visual
 ---
 
@@ -10,6 +12,7 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(minioclient) # remotes::install_github("cboettig/minioclient")
 install_mc()
+library(gdalcubes)
 ```
 
 ```{r}
@@ -17,9 +20,16 @@ install_mc()
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
 ## turn parallelization on
 gdalcubes::gdalcubes_options(parallel=TRUE)
-# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and Mar 1 2023. Loop through 5 year increments to avoid ingest_planetary_data timing out.
+#dates <- c("2002-01-01", "2007-01-01", "2012-01-01", "2017-01-01", "2022-01-01", "2025-03-01")
+
+mc_alias_set("efi", "data.ecoforecast.org",
+             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+
+dir.create("cube")
+
 raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
-                                     end_date = "2023-07-01",
+                                     end_date = "2007-01-01",
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
                                      dx = 0.1,
@@ -27,15 +37,119 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      dt = "P30D",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
+
+
+write_tif(raster_cube, dir = "cube", prefix = "")
+
+raster_cube <- ingest_planetary_data(start_date = "2007-01-01",
+                                     end_date = "2012-01-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+
+
+write_tif(raster_cube, dir = "cube", prefix = "")
+
+raster_cube <- ingest_planetary_data(start_date = "2012-01-01",
+                                     end_date = "2017-01-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+
+
+write_tif(raster_cube, dir = "cube", prefix = "")
+
+raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
+                                     end_date = "2022-01-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+
+
+write_tif(raster_cube, dir = "cube", prefix = "")
+
+raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
+                                     end_date = "2025-03-01",
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+
+
+write_tif(raster_cube, dir = "cube", prefix = "")
+
+
+# new_cube <- join_bands(list(raster_cube_old, raster_cube))
+
+
+
 ## extract dimension values of raster cube
-d <- gdalcubes::dimension_values(raster_cube)
+# d <- gdalcubes::dimension_values(raster_cube)
 
-mc_alias_set("efi", "data.ecoforecast.org",
-             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+# mc_alias_set("efi", "data.ecoforecast.org",
+#              access_key = "", secret_key = "")
 
-dir.create("cube")
 
-write_ncdf(raster_cube,"cube/time_series_cube.nc")
+
+# write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
 mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
+# 
+#  dir.create("files")
+# 
+# 
+#  mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
+# 
+# cube <- gdalcubes::create_image_collection(dir_ls("files/"))
+# 
+# box <- fire_box
+# 
+# start_date <- "2002-01-01"
+# 
+# end_date <- "2025-03-01"
+# 
+# asset_name = "Lai_500m"
+# srs = "EPSG:4326"
+# dx = 0.1
+# dy = 0.1
+# dt = "P30D"
+# aggregation = "mean"
+# resampling = "near"
+#   
+#   # set dimensions of the cube
+#   v <- gdalcubes::cube_view(srs = srs, #lat/lon
+#                  extent = list(t0 = as.character(start_date), t1 = as.character(end_date),
+#                                left = box[1], right = box[3],
+#                                top = box[4], bottom = box[2]),
+#                  dx = dx, dy = dy, dt= dt,
+#                  aggregation = aggregation, resampling = resampling)
+#   
+#   # create proxy data cube
+#   proxy_cube <- gdalcubes::raster_cube(cube, v)
+# 
+#  cube <- ncdf_cube("files/time_series_cube.nc")
+#  
+#  
+#  dir_ls("files/")
+#  
+ 
+# 
+# plot(cube)
+
+
 ```
