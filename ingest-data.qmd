@@ -34,31 +34,31 @@ raster_cube <- ingest_planetary_data(start_date = dates[1],
                                      asset_name = "Lai_500m")
 
 
-
-for(i in 2:(1-length(dates))){
-  raster_cube_new <- ingest_planetary_image_collection(start_date = dates[i],
-                                     end_date = dates[i+1],
-                                     box = fire_box$bbox,
-                                     srs = "EPSG:4326",
-                                     dx = 0.1,
-                                     dy = 0.1,
-                                     dt = "P30D",
-                                     collection = "modis-15A2H-061",
-                                     asset_name = "Lai_500m")
-  
-  
-  
-  raster_cube <- add_images(raster_cube, raster_cube_new)
-  
-}
-
+# 
+# for(i in 2:(1-length(dates))){
+#   raster_cube_new <- ingest_planetary_image_collection(start_date = dates[i],
+#                                      end_date = dates[i+1],
+#                                      box = fire_box$bbox,
+#                                      srs = "EPSG:4326",
+#                                      dx = 0.1,
+#                                      dy = 0.1,
+#                                      dt = "P30D",
+#                                      collection = "modis-15A2H-061",
+#                                      asset_name = "Lai_500m")
+#   
+#   
+#   
+#   raster_cube <- add_images(raster_cube, raster_cube_new)
+#   
+# }
+# 
 
 # new_cube <- join_bands(list(raster_cube_old, raster_cube))
 
 
 
 ## extract dimension values of raster cube
-d <- gdalcubes::dimension_values(raster_cube)
+# d <- gdalcubes::dimension_values(raster_cube)
 
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
@@ -68,22 +68,22 @@ mc_alias_set("efi", "data.ecoforecast.org",
 
 dir.create("cube")
 
-write_tif(raster_cube,dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
 
-write_ncdf(raster_cube,"cube/time_series_cube.nc")
+# write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
 mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 
-dir.create("files")
-
-mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
-
+# dir.create("files")
+# 
+# 
+# mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
 
 # mc_cp("spat4cast-targets/P1M/LAI_modis/august_complex/lai_recovery-target-2025-03-01.tif", "files", recursive = TRUE)
 
-cube <- ncdf_cube("files/time_series_cube.nc")
-
-plot(cube)
+# cube <- ncdf_cube("files/time_series_cube.nc")
+# 
+# plot(cube)
 
 
 ```
