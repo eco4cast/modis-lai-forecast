@@ -120,21 +120,11 @@ The Challenge has been organized by the Ecological Forecasting
 Initiative Research Coordination Network ([EFI
 RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are the first to set up a system to continually compile and score community generated forecasts for true out of sample data prior to data collection. *Some additional comments about the temporal challenge here*. Questions about ecosystems and ecosystem services are inherently focused on the future because they involve understanding how natural systems will respond to changing environmental, social, and economic conditions over time. Commonly ecosystems are analyzed as single longitudinal time series. However, the intrinsic biodiversity within ecosystems leads to spatial gradients with varying ecosystem services. In this workshop, we present our prototype of a spatio-temporal forecasting challenge. This project represents a novel direction for the EFI-RCN and the field of ecological forecasting as a whole, by moving from single-site temporal forecast models to the consideration of entire eco-regions in a spatio-temporal setting.
 
-The Challenge asks the scientific community to produce ecological
-forecasts of future observations of ecological data that will be
-collected and published by the [National Ecological Observatory Network
-(NEON)](https://www.neonscience.org/). The Challenge is split into [five
-themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites)
-that span aquatic and terrestrial systems, and population, community,
-and ecosystem processes across a broad range of ecoregions. We are
-excited to use this Challenge to learn more about the predictability of
-ecological processes by forecasting NEON data before it is collected.
+_The Challenge asks the scientific community to produce ecological forecasts of future observations of ecological data that will be collected and published by the [National Ecological Observatory Network (NEON)](https://www.neonscience.org/). The Challenge is split into [five themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites) that span aquatic and terrestrial systems, and population, community, and ecosystem processes across a broad range of ecoregions. We are excited to use this Challenge to learn more about the predictability of ecological processes by forecasting NEON data before it is collected._
 
 While we believe that it is crucial to incorporate spatial components into existing temporal forecasting models, there are challenges to address including the evaluation of spatially misaligned forecasts, increased model complexity and computation time, and the need to archive metadata for spatio-temporal ensemble forecasts. There are also natural research questions that scaffold from all of the previous research done in the context of the EFI-NEON forecasting challenge: are the same modeling frameworks that we deemed successful in this forecasting challenge well-suited to the additional of a spatial component? Are these models still successful but difficult to scale, computationally? Does the additional of granular spatial covariates help us to improve predictive performance of the model over it's temporal counterpart? All of these questions are wide open but we need **you**, the Ecological Forecasting community, to help! 
 
-The Challenge is open to any individual or team from anywhere around the world that wants to submit forecasts. Learn more
-about how you can participate
-[here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html).
+_The Challenge is open to any individual or team from anywhere around the world that wants to submit forecasts. Learn more about how you can participate [here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html)._
 
 ## 2.2 Goals for forecasts of post fire recovery
 
@@ -267,7 +257,26 @@ ensemble_forecast_dir |>
 
 The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
 
+A time series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D, Q)$_s$** process if it can be written in the form:
+\begin{align*}
+\phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
+\end{align*}
+(do we need this? can I just link to other SARIMA material?)
+
 The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ and their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
+
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a matrix as input (we might want to change this to take the target file?) and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
+
+```{r, eval = F}
+target_mat <- read_csv('../nimble_mat.csv')
+parametric_forecast_dir1 <- spat_arima_grid(cuberast = target_mat,
+                                          date = '2025-03-01',
+                                          dir = 'gsarima')
+
+parametric_forecast_dir1 |>
+  spat4cast_submit(model_id = 'johnsmith')
+
+```
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
 
