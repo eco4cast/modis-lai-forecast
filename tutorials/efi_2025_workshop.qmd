@@ -118,7 +118,7 @@ library(neon4cast)
 
 The Challenge has been organized by the Ecological Forecasting
 Initiative Research Coordination Network ([EFI
-RCN](https://ecoforecast.org/)).
+RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are the first to set up a system to continually compile and score community generated forecasts for true out of sample data prior to data collection. *Some additional comments about the temporal challenge here*. Questions about ecosystems and ecosystem services are inherently focused on the future because they involve understanding how natural systems will respond to changing environmental, social, and economic conditions over time. Commonly ecosystems are analyzed as single longitudinal time series. However, the intrinsic biodiversity within ecosystems leads to spatial gradients with varying ecosystem services. In this workshop, we present our prototype of a spatio-temporal forecasting challenge. This project represents a novel direction for the EFI-RCN and the field of ecological forecasting as a whole, by moving from single-site temporal forecast models to the consideration of entire eco-regions in a spatio-temporal setting.
 
 The Challenge asks the scientific community to produce ecological
 forecasts of future observations of ecological data that will be
@@ -316,12 +316,16 @@ In order to avoid any potential package and dependecy related issues with the in
 site <- 'SOAP'
 ```
 
-The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found here: https://data.neonscience.org/) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
+The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found [here]: (https://data.neonscience.org/)) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
 
 ```{r, eval = F}
 ## air temp data product
 air_temp_dp <- 'DP1.00003.001'
+```
 
+Once we have identified our site and data product of interest, we can use the `neon_download` function from the `neonstore` package to pull the data. For further reading on `neonstore`, Claire K. Lunch has an excellent tutorial that can be found [here](https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial).
+
+```{r, eval = F}
 ## use neonstore package "neon_download" function to pull data product
 ## for triple aspirated air temperature
 neon_download(product = air_temp_dp, site = site)
