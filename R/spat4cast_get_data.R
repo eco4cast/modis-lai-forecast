@@ -2,6 +2,7 @@
 #'
 #' @param start_date start date as character format yyyy-mm-dd
 #' @param end_date end date as character format yyyy-mm-dd
+#' @param fire character, the name of the fire/ site
 #' @param box numeric vector in the format of (xmin, ymin, xmax, ymax)
 #' @param asset_name mame of asset 
 #' @param srs target spatial reference system as a string; can be a proj4 definition, WKT, or in the form "EPSG:XXXX"
@@ -17,6 +18,7 @@
 #' 
 spat4cast_get_data <- function(start_date = "2002-01-01",
                                   end_date = "2025-03-01",
+                                  fire,
                                   box,
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
@@ -37,7 +39,7 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
   dir.create("files")
   
   # Copy files from miniobucket
-  mc_cp("efi/spat4cast-data/variable=lai_recovery/site_id=august_complex/", "files", recursive = TRUE)
+  mc_cp(paste0("efi/spat4cast-data/variable=lai_recovery/site_id=",fire,"/"), "files", recursive = TRUE)
   
   # extract dates from copied files
   d <-str_extract(dir_ls("files/"), "(?<=/).*(?=\\.)")
