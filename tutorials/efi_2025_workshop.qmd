@@ -130,11 +130,9 @@ and ecosystem processes across a broad range of ecoregions. We are
 excited to use this Challenge to learn more about the predictability of
 ecological processes by forecasting NEON data before it is collected.
 
-Which modeling frameworks, mechanistic processes, and statistical
-approaches best capture community, population, and ecosystem dynamics?
-These questions are answerable by a community generating a diverse array
-of forecasts. The Challenge is open to any individual or team from
-anywhere around the world that wants to submit forecasts. Learn more
+While we believe that it is crucial to incorporate spatial components into existing temporal forecasting models, there are challenges to address including the evaluation of spatially misaligned forecasts, increased model complexity and computation time, and the need to archive metadata for spatio-temporal ensemble forecasts. There are also natural research questions that scaffold from all of the previous research done in the context of the EFI-NEON forecasting challenge: are the same modeling frameworks that we deemed successful in this forecasting challenge well-suited to the additional of a spatial component? Are these models still successful but difficult to scale, computationally? Does the additional of granular spatial covariates help us to improve predictive performance of the model over it's temporal counterpart? All of these questions are wide open but we need **you**, the Ecological Forecasting community, to help! 
+
+The Challenge is open to any individual or team from anywhere around the world that wants to submit forecasts. Learn more
 about how you can participate
 [here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html).
 
@@ -235,7 +233,7 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r, eval = T}
+```{r, eval = TRUE, cache = TRUE}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
@@ -331,6 +329,8 @@ Once we have identified our site and data product of interest, we can use the `n
 neon_download(product = air_temp_dp, site = site)
 ```
 
+With our data product of interest downloaded, we can now focus on aggregation to our desired timescale. Triple aspirated air temperature is available as one and thirty minute averages, and here we demonstrate how to aggregate to daily minimum and maximum temperature.
+
 ```{r, eval = FALSE}
 ## read the 30 minute measurements into temp_table
 temp_table <- neon_read("TAAT_30min-basic", site = site)
@@ -349,7 +349,7 @@ temp_info <- temp_table %>%
               replace(., is.infinite(.), NA))
 ```
 
-The optional fourth step is imputation of missing data. 
+The optional fourth step is imputation of missing data. In this example, we provide code for data imputation using a Kalman filter. We do note that data imputation can be done in many different ways, and thus in the example covariate data provided we include columns with both aggregated imputed data and aggregated raw data for any user who would like to employ their own imputation strategies.
 
 ```{r, eval = FALSE}
 library(imputeTS) ## for na_kalman
@@ -357,6 +357,47 @@ library(imputeTS) ## for na_kalman
 ## interpolate missing temperature values using a kalman filter
 temp_info$MinTInterp <- na_kalman(temp_info$MinT_daily)
 temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
+```
+
+Though we won't go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:
+
+```{r}
+## set data product for shortwave radiation (primary pyranometer)
+swpp_dp <- 'DP1.00014.001'
+
+## download shortwave radiation data from NEON
+neon_download(product = swpp_dp, site = site)
+
+## extract 30 minute shortwave radiation data
+rad_table <- neon_read("SRDDP_30min-basic", site = site)
+
+rad_info <- rad_table %>%
+  mutate(Date = as_date(endDateTime),
+         gloRadMean = if_else(gloRadFinalQF == 0,
+                              gloRadMean,
+                              NA)) %>%
+  group_by(Date) %>%
+  summarize(DirRad = mean(gloRadMean, na.rm = TRUE)) %>%
+  mutate_if(is.numeric, ~
+              replace(., is.nan(.), NA))
+rad_info$DirRadInterp <- na_kalman(rad_info$DirRad)
+
+## extract and aggregate radiation data to daily time
+
+rh_dp <- 'DP1.00098.001'
+neon_download(product = rh_dp, site = site)
+rh_table <- neon_read("RH_30min", site = site)
+
+rh_info <- rh_table %>%
+  mutate(Date = as_date(endDateTime),
+         rhMean = if_else(RHFinalQF == 0,
+                              RHMean,
+                              NA)) %>%
+  group_by(Date) %>%
+  summarize(RelHum = mean(RHMean, na.rm = TRUE)) %>%
+  mutate_if(is.numeric, ~
+              replace(., is.nan(.), NA))
+rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 ```
 
 # 5 What’s next?
