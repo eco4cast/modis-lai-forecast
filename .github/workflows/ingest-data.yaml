@@ -6,7 +6,7 @@ on:
     - cron: '0 1 1 * *' # runs on first of month
   workflow_dispatch:
 
-name: ingets-data
+name: ingest-data
 
 jobs:
   docker:
@@ -40,7 +40,7 @@ jobs:
         run: |
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
           minioclient::install_mc()
-          quarto::quarto_render("ingest-data.qmd")
+          quarto::quarto_render("ingest-data-to-bucket.qmd")
           
       - name: save qmd output
         uses: actions/upload-artifact@v4

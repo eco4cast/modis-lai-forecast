@@ -16,8 +16,11 @@ library(gdalcubes)
 ```
 
 ```{r}
+fire <- "east_troublesome"
+
+# list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
-fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
+fire_box <- fire_bbox(fire = fire, pad_box = TRUE)
 ## turn parallelization on
 gdalcubes::gdalcubes_options(parallel=TRUE)
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and Mar 1 2023. Loop through 5 year increments to avoid ingest_planetary_data timing out.
@@ -25,6 +28,9 @@ gdalcubes::gdalcubes_options(parallel=TRUE)
 
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+
+# mc_alias_set("efi", "data.ecoforecast.org",
+#              "spatial-team", "EXk4HARe6AXoZRR3uVwQ")
 
 dir.create("cube")
 
@@ -81,7 +87,7 @@ raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
 write_tif(raster_cube, dir = "cube", prefix = "")
 
 raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
-                                     end_date = "2025-03-01",
+                                     end_date = "2025-05-01",
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
                                      dx = 0.1,
@@ -93,63 +99,35 @@ raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
 
 write_tif(raster_cube, dir = "cube", prefix = "")
 
+mc_cp("cube", paste0("efi/spat4cast-data/variable=lai_recovery/site_id=", fire,"/"),
+      recursive = TRUE)
 
-# new_cube <- join_bands(list(raster_cube_old, raster_cube))
-
-
-
-## extract dimension values of raster cube
-# d <- gdalcubes::dimension_values(raster_cube)
-
-# mc_alias_set("efi", "data.ecoforecast.org",
-#              access_key = "", secret_key = "")
-
-
-
-# write_ncdf(raster_cube,"cube/time_series_cube.nc")
-
-mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
-# 
-#  dir.create("files")
-# 
-# 
-#  mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
-# 
-# cube <- gdalcubes::create_image_collection(dir_ls("files/"))
-# 
-# box <- fire_box
-# 
-# start_date <- "2002-01-01"
-# 
-# end_date <- "2025-03-01"
-# 
-# asset_name = "Lai_500m"
-# srs = "EPSG:4326"
-# dx = 0.1
-# dy = 0.1
-# dt = "P30D"
-# aggregation = "mean"
-# resampling = "near"
-#   
-#   # set dimensions of the cube
-#   v <- gdalcubes::cube_view(srs = srs, #lat/lon
-#                  extent = list(t0 = as.character(start_date), t1 = as.character(end_date),
-#                                left = box[1], right = box[3],
-#                                top = box[4], bottom = box[2]),
-#                  dx = dx, dy = dy, dt= dt,
-#                  aggregation = aggregation, resampling = resampling)
-#   
-#   # create proxy data cube
-#   proxy_cube <- gdalcubes::raster_cube(cube, v)
-# 
-#  cube <- ncdf_cube("files/time_series_cube.nc")
-#  
-#  
-#  dir_ls("files/")
-#  
+ dir.create("files")
  
-# 
-# plot(cube)
+ mc_cp(paste0("efi/spat4cast-data/variable=lai_recovery/site_id=", fire,"/"),
+              "files", recursive = TRUE)
 
+cube <- gdalcubes::create_image_collection(dir_ls("files/"), date_time = d)
+
+
+dir_ls("files/")
+
+raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
+                                  end_date = "2025-05-01",
+                                  fire_box$bbox,
+                                  collection = "modis-15A2H-061",
+                                  asset_name = "Lai_500m",
+                                  srs = "EPSG:4326",
+                                  dx = 0.1, 
+                                  dy = 0.1, 
+                                  dt = "P30D",
+                                  aggregation = "mean",
+                                  resampling = "near")
+
+d <- gdalcubes::dimension_values(cube_new)
+ 
+mat <- gdalcube_to_matrix(cube_new, d)
+
+sum(!is.na(mat))
 
 ```
