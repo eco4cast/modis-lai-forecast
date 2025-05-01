@@ -20,9 +20,11 @@ library(gdalcubes)
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
 ## turn parallelization on
 gdalcubes::gdalcubes_options(parallel=TRUE)
-# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
-                                     end_date = "2023-07-01",
+# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and Mar 1 2023. Loop through 5 year increments to avoid ingest_planetary_data timing out.
+dates <- c("2002-01-01", "2007-01-01", "2012-01-01", "2019-01-01","2024-01-01", "2025-03-01")
+
+raster_cube <- ingest_planetary_data(start_date = dates[1],
+                                     end_date = dates[2],
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
                                      dx = 0.1,
@@ -30,13 +32,43 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      dt = "P30D",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
+
+
+
+for(i in 2:(1-length(dates))){
+  raster_cube_new <- ingest_planetary_image_collection(start_date = dates[i],
+                                     end_date = dates[i+1],
+                                     box = fire_box$bbox,
+                                     srs = "EPSG:4326",
+                                     dx = 0.1,
+                                     dy = 0.1,
+                                     dt = "P30D",
+                                     collection = "modis-15A2H-061",
+                                     asset_name = "Lai_500m")
+  
+  
+  
+  raster_cube <- add_images(raster_cube, raster_cube_new)
+  
+}
+
+
+# new_cube <- join_bands(list(raster_cube_old, raster_cube))
+
+
+
 ## extract dimension values of raster cube
 d <- gdalcubes::dimension_values(raster_cube)
 
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
+# mc_alias_set("efi", "data.ecoforecast.org",
+#              access_key = "", secret_key = "")
+
 dir.create("cube")
+
+write_tif(raster_cube,dir = "cube", prefix = "august_complex_")
 
 write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
@@ -45,6 +77,9 @@ mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 dir.create("files")
 
 mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
+
+
+# mc_cp("spat4cast-targets/P1M/LAI_modis/august_complex/lai_recovery-target-2025-03-01.tif", "files", recursive = TRUE)
 
 cube <- ncdf_cube("files/time_series_cube.nc")
 
