@@ -39,7 +39,7 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "")
 
 raster_cube <- ingest_planetary_data(start_date = "2007-01-01",
                                      end_date = "2012-01-01",
@@ -52,7 +52,7 @@ raster_cube <- ingest_planetary_data(start_date = "2007-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "")
 
 raster_cube <- ingest_planetary_data(start_date = "2012-01-01",
                                      end_date = "2017-01-01",
@@ -65,7 +65,7 @@ raster_cube <- ingest_planetary_data(start_date = "2012-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "")
 
 raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
                                      end_date = "2022-01-01",
@@ -78,7 +78,7 @@ raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "")
 
 raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
                                      end_date = "2025-03-01",
@@ -91,7 +91,7 @@ raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
+write_tif(raster_cube, dir = "cube", prefix = "")
 
 
 # new_cube <- join_bands(list(raster_cube_old, raster_cube))
@@ -108,16 +108,46 @@ write_tif(raster_cube, dir = "cube", prefix = "august_complex_")
 
 # write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
-mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
-
-# dir.create("files")
+# mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
+# 
+#  dir.create("files")
 # 
 # 
-# mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
-
-# mc_cp("spat4cast-targets/P1M/LAI_modis/august_complex/lai_recovery-target-2025-03-01.tif", "files", recursive = TRUE)
-
-# cube <- ncdf_cube("files/time_series_cube.nc")
+#  mc_cp("efi/spat4cast-data/cube/", "files", recursive = TRUE)
+# 
+# cube <- gdalcubes::create_image_collection(dir_ls("files/"))
+# 
+# box <- fire_box
+# 
+# start_date <- "2002-01-01"
+# 
+# end_date <- "2025-03-01"
+# 
+# asset_name = "Lai_500m"
+# srs = "EPSG:4326"
+# dx = 0.1
+# dy = 0.1
+# dt = "P30D"
+# aggregation = "mean"
+# resampling = "near"
+#   
+#   # set dimensions of the cube
+#   v <- gdalcubes::cube_view(srs = srs, #lat/lon
+#                  extent = list(t0 = as.character(start_date), t1 = as.character(end_date),
+#                                left = box[1], right = box[3],
+#                                top = box[4], bottom = box[2]),
+#                  dx = dx, dy = dy, dt= dt,
+#                  aggregation = aggregation, resampling = resampling)
+#   
+#   # create proxy data cube
+#   proxy_cube <- gdalcubes::raster_cube(cube, v)
+# 
+#  cube <- ncdf_cube("files/time_series_cube.nc")
+#  
+#  
+#  dir_ls("files/")
+#  
+ 
 # 
 # plot(cube)
 
