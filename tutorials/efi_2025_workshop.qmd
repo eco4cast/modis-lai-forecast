@@ -118,25 +118,13 @@ library(neon4cast)
 
 The Challenge has been organized by the Ecological Forecasting
 Initiative Research Coordination Network ([EFI
-RCN](https://ecoforecast.org/)).
+RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are the first to set up a system to continually compile and score community generated forecasts for true out of sample data prior to data collection. *Some additional comments about the temporal challenge here*. Questions about ecosystems and ecosystem services are inherently focused on the future because they involve understanding how natural systems will respond to changing environmental, social, and economic conditions over time. Commonly ecosystems are analyzed as single longitudinal time series. However, the intrinsic biodiversity within ecosystems leads to spatial gradients with varying ecosystem services. In this workshop, we present our prototype of a spatio-temporal forecasting challenge. This project represents a novel direction for the EFI-RCN and the field of ecological forecasting as a whole, by moving from single-site temporal forecast models to the consideration of entire eco-regions in a spatio-temporal setting.
 
-The Challenge asks the scientific community to produce ecological
-forecasts of future observations of ecological data that will be
-collected and published by the [National Ecological Observatory Network
-(NEON)](https://www.neonscience.org/). The Challenge is split into [five
-themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites)
-that span aquatic and terrestrial systems, and population, community,
-and ecosystem processes across a broad range of ecoregions. We are
-excited to use this Challenge to learn more about the predictability of
-ecological processes by forecasting NEON data before it is collected.
+_The Challenge asks the scientific community to produce ecological forecasts of future observations of ecological data that will be collected and published by the [National Ecological Observatory Network (NEON)](https://www.neonscience.org/). The Challenge is split into [five themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites) that span aquatic and terrestrial systems, and population, community, and ecosystem processes across a broad range of ecoregions. We are excited to use this Challenge to learn more about the predictability of ecological processes by forecasting NEON data before it is collected._
 
-Which modeling frameworks, mechanistic processes, and statistical
-approaches best capture community, population, and ecosystem dynamics?
-These questions are answerable by a community generating a diverse array
-of forecasts. The Challenge is open to any individual or team from
-anywhere around the world that wants to submit forecasts. Learn more
-about how you can participate
-[here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html).
+While we believe that it is crucial to incorporate spatial components into existing temporal forecasting models, there are challenges to address including the evaluation of spatially misaligned forecasts, increased model complexity and computation time, and the need to archive metadata for spatio-temporal ensemble forecasts. There are also natural research questions that scaffold from all of the previous research done in the context of the EFI-NEON forecasting challenge: are the same modeling frameworks that we deemed successful in this forecasting challenge well-suited to the additional of a spatial component? Are these models still successful but difficult to scale, computationally? Does the additional of granular spatial covariates help us to improve predictive performance of the model over it's temporal counterpart? All of these questions are wide open but we need **you**, the Ecological Forecasting community, to help! 
+
+_The Challenge is open to any individual or team from anywhere around the world that wants to submit forecasts. Learn more about how you can participate [here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html)._
 
 ## 2.2 Goals for forecasts of post fire recovery
 
@@ -235,12 +223,12 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r, eval = F}
+```{r, eval = TRUE}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2002-01-01", 
+raster_cube <- ingest_planetary_data(start_date = "2015-01-01", 
                                      end_date = "2025-03-01", 
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
@@ -249,30 +237,46 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      dt = "P30D",
                                      collection = "modis-15A2H-061",
                                      asset_name = "Lai_500m")
-# create target file
-date <- '2023-06-01'
-target <- create_target_file(cuberast = raster_cube,
-                             date = date,
-                             dir = "/vsis3/spat4cast-targets",
-                             mask = fire_box$maskLayer)
 ```
 
-```{r, eval = F}
+```{r, include=FALSE}
 # Forecast ----------------------------------------------------------------
-
+library(minioclient)
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
-                                          date = '2023-06-01',
+                                          date = '2025-03-01',
                                           dir = 'climatology')
 
+install_mc()
+mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
+
 ensemble_forecast_dir |>
-  spat4cast_submit()
+  spat4cast_submit(model_id = 'johnsmith')
 ```
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
 
 The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
 
+A time series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D, Q)$_s$** process if it can be written in the form:
+\begin{align*}
+\phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
+\end{align*}
+(do we need this? can I just link to other SARIMA material?)
+
 The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ and their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
+
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a matrix as input (we might want to change this to take the target file?) and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
+
+```{r, eval = F}
+target_mat <- read_csv('../nimble_mat.csv')
+parametric_forecast_dir1 <- spat_arima_grid(cuberast = target_mat,
+                                          date = '2025-03-01',
+                                          dir = 'gsarima')
+
+parametric_forecast_dir1 |>
+  spat4cast_submit(model_id = 'johnsmith')
+
+```
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
 
@@ -319,16 +323,22 @@ In order to avoid any potential package and dependecy related issues with the in
 site <- 'SOAP'
 ```
 
-The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found here: https://data.neonscience.org/) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
+The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found [here]: (https://data.neonscience.org/)) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
 
 ```{r, eval = F}
 ## air temp data product
 air_temp_dp <- 'DP1.00003.001'
+```
 
+Once we have identified our site and data product of interest, we can use the `neon_download` function from the `neonstore` package to pull the data. For further reading on `neonstore`, Claire K. Lunch has an excellent tutorial that can be found [here](https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial).
+
+```{r, eval = F}
 ## use neonstore package "neon_download" function to pull data product
 ## for triple aspirated air temperature
 neon_download(product = air_temp_dp, site = site)
 ```
+
+With our data product of interest downloaded, we can now focus on aggregation to our desired timescale. Triple aspirated air temperature is available as one and thirty minute averages, and here we demonstrate how to aggregate to daily minimum and maximum temperature.
 
 ```{r, eval = FALSE}
 ## read the 30 minute measurements into temp_table
@@ -337,7 +347,15 @@ temp_table <- neon_read("TAAT_30min-basic", site = site)
 ## create table of minimum and maximum temps
 temp_info <- temp_table %>%
   ## use lubridate to extract date format
-  mutate(Date = as_date(endDateTime)) %>%
+  ## extract only max and min data that does not
+  ## have a quality flag 
+  mutate(Date = as_date(endDateTime),
+         tempTripleMaximum = if_else(finalQF == 0,
+                              tempTripleMaximum,
+                              NA),
+         tempTripleMinimum = if_else(finalQF == 0,
+                              tempTripleMinimum,
+                              NA)) %>%
   ## group_by date to get daily mins/maxs
   group_by(Date) %>%
   ## compute minimums and maximums
@@ -348,7 +366,7 @@ temp_info <- temp_table %>%
               replace(., is.infinite(.), NA))
 ```
 
-The optional fourth step is imputation of missing data. 
+The optional fourth step is imputation of missing data. In this example, we provide code for data imputation using a Kalman filter. We do note that data imputation can be done in many different ways, and thus in the example covariate data provided we include columns with both aggregated imputed data and aggregated raw data for any user who would like to employ their own imputation strategies.
 
 ```{r, eval = FALSE}
 library(imputeTS) ## for na_kalman
@@ -356,6 +374,47 @@ library(imputeTS) ## for na_kalman
 ## interpolate missing temperature values using a kalman filter
 temp_info$MinTInterp <- na_kalman(temp_info$MinT_daily)
 temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
+```
+
+Though we won't go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:
+
+```{r, eval = FALSE}
+## set data product for shortwave radiation (primary pyranometer)
+swpp_dp <- 'DP1.00014.001'
+
+## download shortwave radiation data from NEON
+neon_download(product = swpp_dp, site = site)
+
+## extract 30 minute shortwave radiation data
+rad_table <- neon_read("SRDDP_30min-basic", site = site)
+
+rad_info <- rad_table %>%
+  mutate(Date = as_date(endDateTime),
+         gloRadMean = if_else(gloRadFinalQF == 0,
+                              gloRadMean,
+                              NA)) %>%
+  group_by(Date) %>%
+  summarize(DirRad = mean(gloRadMean, na.rm = TRUE)) %>%
+  mutate_if(is.numeric, ~
+              replace(., is.nan(.), NA))
+rad_info$DirRadInterp <- na_kalman(rad_info$DirRad)
+
+## extract and aggregate radiation data to daily time
+
+rh_dp <- 'DP1.00098.001'
+neon_download(product = rh_dp, site = site)
+rh_table <- neon_read("RH_30min", site = site)
+
+rh_info <- rh_table %>%
+  mutate(Date = as_date(endDateTime),
+         rhMean = if_else(RHFinalQF == 0,
+                              RHMean,
+                              NA)) %>%
+  group_by(Date) %>%
+  summarize(RelHum = mean(RHMean, na.rm = TRUE)) %>%
+  mutate_if(is.numeric, ~
+              replace(., is.nan(.), NA))
+rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 ```
 
 # 5 What’s next?
@@ -369,3 +428,4 @@ temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
 
 # 6 Acknowledgements
 
+We would like to thank everyone who has joined the EFI Cyberinfrastructure calls during the last two years to provide feedback and discuss progress on this project. A special thank you to Carl Boettiger and Quinn Thomas for all of their assistance, from the onset of this project during the 2023 EFI Unconference to present.
