@@ -233,7 +233,7 @@ suppressPackageStartupMessages(source("../packages.R"))
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
 
-```{r, eval = TRUE, cache = TRUE}
+```{r, eval = TRUE}
 # Ingest data ------------------------------------------------------------
 gdalcubes::gdalcubes_options(parallel=TRUE)
 
@@ -338,7 +338,15 @@ temp_table <- neon_read("TAAT_30min-basic", site = site)
 ## create table of minimum and maximum temps
 temp_info <- temp_table %>%
   ## use lubridate to extract date format
-  mutate(Date = as_date(endDateTime)) %>%
+  ## extract only max and min data that does not
+  ## have a quality flag 
+  mutate(Date = as_date(endDateTime),
+         tempTripleMaximum = if_else(finalQF == 0,
+                              tempTripleMaximum,
+                              NA),
+         tempTripleMinimum = if_else(finalQF == 0,
+                              tempTripleMinimum,
+                              NA)) %>%
   ## group_by date to get daily mins/maxs
   group_by(Date) %>%
   ## compute minimums and maximums
@@ -361,7 +369,7 @@ temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
 
 Though we won't go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:
 
-```{r}
+```{r, eval = FALSE}
 ## set data product for shortwave radiation (primary pyranometer)
 swpp_dp <- 'DP1.00014.001'
 
@@ -411,3 +419,4 @@ rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 
 # 6 Acknowledgements
 
+We would like to thank everyone who has joined the EFI Cyberinfrastructure calls during the last two years to provide feedback and discuss progress on this project. A special thank you to Carl Boettiger and Quinn Thomas for all of their assistance, from the onset of this project during the 2023 EFI Unconference to present.
