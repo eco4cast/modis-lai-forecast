@@ -108,7 +108,7 @@ write_tif(raster_cube, dir = "cube", prefix = "")
 
 # write_ncdf(raster_cube,"cube/time_series_cube.nc")
 
-# mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
+mc_cp("cube", "efi/spat4cast-data/", recursive = TRUE)
 # 
 #  dir.create("files")
 # 
