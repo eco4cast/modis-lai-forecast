@@ -29,7 +29,7 @@ mc_alias_set("efi", "data.ecoforecast.org",
 dir.create("cube")
 
 for(i in 1:(1-length(dates))){
-  raster_cube <- ingest_planetary_image_collection(start_date = dates[i],
+  raster_cube <- ingest_planetary_data(start_date = dates[i],
                                      end_date = dates[i+1],
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
