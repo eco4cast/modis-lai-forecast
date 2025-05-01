@@ -102,12 +102,14 @@ write_tif(raster_cube, dir = "cube", prefix = "")
 mc_cp("cube", paste0("efi/spat4cast-data/variable=lai_recovery/site_id=", fire,"/"),
       recursive = TRUE)
 
- dir.create("files")
+dir.create("files")
  
- mc_cp(paste0("efi/spat4cast-data/variable=lai_recovery/site_id=", fire,"/"),
+mc_cp(paste0("efi/spat4cast-data/variable=lai_recovery/site_id=", fire,"/"),
               "files", recursive = TRUE)
+ 
+dates <-str_extract(dir_ls("files/"), "(?<=/).*(?=\\.)")
 
-cube <- gdalcubes::create_image_collection(dir_ls("files/"), date_time = d)
+cube <- gdalcubes::create_image_collection(dir_ls("files/"), date_time = dates)
 
 
 dir_ls("files/")
@@ -124,9 +126,9 @@ raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
                                   aggregation = "mean",
                                   resampling = "near")
 
-d <- gdalcubes::dimension_values(cube_new)
+d <- gdalcubes::dimension_values(raster_cube)
  
-mat <- gdalcube_to_matrix(cube_new, d)
+mat <- gdalcube_to_matrix(raster_cube, d)
 
 sum(!is.na(mat))
 
