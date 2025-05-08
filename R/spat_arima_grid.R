@@ -1,6 +1,6 @@
 #' Build arima forecast for each gridcell. Currently just works for august complex with grid data.
 #'
-#' @param data_matrix matrix of data to generate forecasts with
+#' @param cuberast object of class cube; raster cube to generate forecasts on
 #' @param date date as character format yyyy-mm-dd; date to generate forecast
 #' @param dir character; directory to store geotiff files. If the specified directory does not exist, it is created
 #' @return character; directory that geotiff files are written to.
@@ -22,15 +22,14 @@
 #' 
 
 
-spat_arima_grid <- function(data_csv, dir = 'parametric', target){
+spat_arima_grid <- function(cuberast, dir = 'parametric', target){
   ## FUNCTION: spat_grid_ensemble
   ## PURPOSE: spat_grid_ensemble takes a data matrix, target, and directory
   ## and generates a one-step-ahead arima forecast for each grid.
   ## This is an parametric forecasting method, and saves the parameters as
   ## a two layer geotiff file in the specified directory
   ## INPUTS: 
-  ## data_csv - csv containing data for grid cells. rows are time and 
-  ## columns are gridcells. 
+  ## cuberast - object of class cube; raster cube to generate forecasts on 
   ## dir - character vector, directory to store geotiff files.
   ## if the specified directory does not exist, it is created
   ## target - target raster. Used to set the spatial attributes 
@@ -40,7 +39,8 @@ spat_arima_grid <- function(data_csv, dir = 'parametric', target){
   ## OUTPUTS: N/A
   
   # Read in data matrix
-  mat_dat <- read_csv(data_csv, na =c("", "NA", "0"))
+  #mat_dat <- read_csv(data_csv, na =c("", "NA", "0"))
+  mat_dat <- gdalcube_to_matrix(cube = cuberast, d = cuberast$d)
   
   # Load target raster
   target_rast <- terra::rast(target, vsi = TRUE)
