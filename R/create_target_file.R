@@ -53,7 +53,7 @@ create_target_file <- function(
     # needed to write geotif to VSI
     Sys.setenv("CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE"="YES") 
   
-    out <- glue::glue("{dir}/{dt}/{var}/{site_id}/lai_recovery-target-{date}.tif")
+    out <- glue::glue("{dir}/duration={dt}/variable_id={var}/site={site_id}/lai_recovery-target-{date}.tif")
     
     # doesn't take VSI yet; so convert to stars first instead:
     # write_tif(target, dir, "lai_recovery_target_") 
