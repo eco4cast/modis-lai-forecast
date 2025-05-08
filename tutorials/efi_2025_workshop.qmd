@@ -274,13 +274,13 @@ ensemble_forecast_dir |>
 
 The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
 
-A time series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D, Q)$_s$** process if it can be written in the form:
+If we are in the business of providing technical definitions: a time series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D, Q)$_s$** process if it can be written in the form:
 \begin{align*}
 \phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
 \end{align*}
-(do we need this? can I just link to other SARIMA material?)
+(do we need this? can I just link to other SARIMA material?). For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
 
-The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ and their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
+There are a number of quantities that require estimation within each grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ as well as estimates of their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
 
 We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a matrix as input (we might want to change this to take the target file?) and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
 

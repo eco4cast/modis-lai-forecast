@@ -1,4 +1,4 @@
-#' Download data from spat4cast-data bucket and turn it into a cube raster 
+#' Extract matrix from gdalcube
 #'
 #' @param cube A data cube proxy object (gdalcubes) to extract values from
 #' @param d dimension value object for rastercube 'cube'
