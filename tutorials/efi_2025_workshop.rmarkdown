@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 # 1 About this tutorial
 
 ## 1.1 Learning objectives
@@ -196,8 +197,8 @@ The main branch currently has two baseline models implemented. These models are 
 - A grid ARIMA parametric model
 
 We also have two baseline models in the development and debugging stage:
-- A spatio-temporal ICAR random walk
-- A spatio-temporal Gaussian Process 
+- A spatial-temporal ICAR random walk
+- A spatial Gaussian Process 
 
 For now, the first two models that we have implemented will provide reasonable competitors to the models developed by challenge participants, and in the context of this workshop will provide a nice demonstration of the difference between parametric and ensemble models and how they are scored.
 
@@ -211,6 +212,7 @@ In the context of generating baseline forecasts for post-fire LAI recovery, we h
 
 A natural follow-up question: once we have identified the data, we want a baseline model. So what exactly is the statistical model that we are using here?
 
+
 ```{r, echo = FALSE}
 set.seed(05192025)
 dat <- c(rnorm(10, mean = 4), rnorm(10, mean = 10)) 
@@ -218,11 +220,14 @@ hist(dat, breaks = 200, ylim = c(0, 2),
      main = 'Histogram of 20 Data Points')
 ```
 
+
 In fact these singleton data points *are* our statistical model, at least after a little bit of work. We put some little densities around them (sometimes called "kernel dressing" in the literature) and these little densities come together to turn these singleton points into a forecast distribution. Taking our example from above, this process yields the following:
+
 
 ```{r}
 plot(density(dat))
 ```
+
 
 By choosing to "fit" a non-parametric model to our data we get some additional flexibility, since we don't have to conform to some particular pre-specified probability distribution. For example, if we were to just take a mean and standard deviation of the above data and treat it as a univariate Normal distribution we would be missing out on the fact that our data is actually bimodal with two areas of high density.
 
@@ -230,7 +235,8 @@ In many situations, the climatology or local climatology models perform surprisi
 
 Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
 
-```{r, echo = FALSE, include = FALSE}
+
+```{r, echo = FALSE}
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(tidyverse)
 suppressPackageStartupMessages(source("../packages.R"))
@@ -270,6 +276,7 @@ ensemble_forecast_dir |>
   spat4cast_submit(model_id = 'johnsmith')
 ```
 
+
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
 
 The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
@@ -278,11 +285,12 @@ If we are in the business of providing technical definitions: a time series $x =
 \begin{align*}
 \phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
 \end{align*}
-For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
+(do we need this? can I just link to other SARIMA material?). For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
 
 There are a number of quantities that require estimation within each grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ as well as estimates of their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
 
-We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to for pipeline purposes. 
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
+
 
 ```{r, eval = T}
 parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
@@ -292,6 +300,7 @@ parametric_forecast_dir1 |>
   spat4cast_submit(model_id = 'johnsmith')
 
 ```
+
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
 
@@ -315,13 +324,6 @@ Submissions are scored using two different proper scoring rules (Gneiting and Ra
 \end{align}
 The LogS and CRPS are computed for each grid cell in the target. The individual values for each grid cell are saved, and are useful for visualizing particular areas where the forecast model is performing well or poorly. The final value reported for the challenge is simply the mean value of the respective scores across all grid cells. 
 
-There are two broad categories of "types" of forecasts that can be submitted for scoring, and our examples so far have been demonstrative of the differences. 
-
-- _Ensemble forecasts_ 
-- _Parametric forecasts_
-
-These forecasts are handled slightly differently in terms of how they are scored. Unsurprisingly, ensemble forecast submissions are scored using the `scoring_spat_ensemble` function and parametric forecasts are scored using the `scoring_spat_parametric` function. 
-
 
 ## 4.2 How to score your own forecast
 
@@ -344,6 +346,7 @@ In order to avoid any potential package and dependecy related issues with the in
 - Aggregating data to the desired time scale
 - (Optional) Imputing missing data
 
+
 ```{r, eval = FALSE}
 ## set site to desired NEON site
 ## here we will use SOAP, but the other focal
@@ -351,14 +354,18 @@ In order to avoid any potential package and dependecy related issues with the in
 site <- 'SOAP'
 ```
 
+
 The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found [here]: (https://data.neonscience.org/)) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
+
 
 ```{r, eval = F}
 ## air temp data product
 air_temp_dp <- 'DP1.00003.001'
 ```
 
+
 Once we have identified our site and data product of interest, we can use the `neon_download` function from the `neonstore` package to pull the data. For further reading on `neonstore`, Claire K. Lunch has an excellent tutorial that can be found [here](https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial).
+
 
 ```{r, eval = F}
 ## use neonstore package "neon_download" function to pull data product
@@ -366,7 +373,9 @@ Once we have identified our site and data product of interest, we can use the `n
 neon_download(product = air_temp_dp, site = site)
 ```
 
+
 With our data product of interest downloaded, we can now focus on aggregation to our desired timescale. Triple aspirated air temperature is available as one and thirty minute averages, and here we demonstrate how to aggregate to daily minimum and maximum temperature.
+
 
 ```{r, eval = FALSE}
 ## read the 30 minute measurements into temp_table
@@ -394,7 +403,9 @@ temp_info <- temp_table %>%
               replace(., is.infinite(.), NA))
 ```
 
+
 The optional fourth step is imputation of missing data. In this example, we provide code for data imputation using a Kalman filter. We do note that data imputation can be done in many different ways, and thus in the example covariate data provided we include columns with both aggregated imputed data and aggregated raw data for any user who would like to employ their own imputation strategies.
+
 
 ```{r, eval = FALSE}
 library(imputeTS) ## for na_kalman
@@ -404,7 +415,9 @@ temp_info$MinTInterp <- na_kalman(temp_info$MinT_daily)
 temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
 ```
 
+
 Though we won't go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:
+
 
 ```{r, eval = FALSE}
 ## set data product for shortwave radiation (primary pyranometer)
@@ -444,6 +457,7 @@ rh_info <- rh_table %>%
               replace(., is.nan(.), NA))
 rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 ```
+
 
 # 5 What’s next?
 
