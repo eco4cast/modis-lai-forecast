@@ -2,9 +2,9 @@
 #'
 #' @param start_date start date as character format yyyy-mm-dd
 #' @param end_date end date as character format yyyy-mm-dd
-#' @param box numberic vector in the format of (xmin, ymin, xmax, ymax)
+#' @param box numeric vector in the format of (xmin, ymin, xmax, ymax)
 #' @param collection name of planetary collection
-#' @param asset_name mame of asset 
+#' @param asset_name name of asset 
 #' @param srs target spatial reference system as a string; can be a proj4 definition, WKT, or in the form "EPSG:XXXX"
 #' @param dx size of pixels in x-direction (longitude / easting)
 #' @param dy size of pixels in y-direction (latitude / northing)

@@ -177,15 +177,35 @@ up to 3 months ahead on a monthly time step.w
 
 ## 3.1 Define spatial and temporal parameters for our forecast
 
+Before we can forecast fire recovery, we first need to define the fires of interest and their spatial extents. We have initially selected a handful of fires that span ecosystem types, occurred in close proximity to NEON sites to provide additional data sources for modeling efforts, occurred relatively recently, and were relatively large fires as the MODIS LAI data is being used currently at a relatively course resolution. We currently have shape files defined for 5 fires with 3 occurring in close proximity to NEON sites, the fire names in the spatial forecast system are:
+
+ - august_complex = California August Complex fire started in August 2017 and burned a total of 1,032,648 acres (417,898 ha) in NW California.
+ - east_troublesome = Colorado East Troublesome fire burned 193,812 acres in October and November 2020.
+ - sawmill = The Sawmill Fire that burned 46,991 acres (190 km^2) in the U.S. state of Arizona in April 2017 and was close in proximity Santa Rita Experimental Range (NEON SRER: https://www.neonscience.org/field-sites/srer)
+ - creek = Soaproot Saddle (NEON SOAP: https://www.neonscience.org/field-sites/soap)
+ - chimney_tops = The Chimney Tops 2 fire occured in November 2016 in and around Great Smoky Mountain National Park (NEON GRSM: https://www.neonscience.org/field-sites/grsm)
+ 
+The target areas for these fires are available in the `/shp` directory in Github repository. The `fire_box` function is available to grab the target area for each fire. The `pad_box` argument will pad a 0.5 degrees on each side on each side of the bounding box as defined by the fire mask shapefiles. Below is an example for the `august_complex` fire.
+
+
+```{r}
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
+```
+
 
 ## 3.2 Read in the data
 
 
+
 ## 3.3 Visualise the target data
+
+The target data are stored in MInIO bucket. MinIO is high-performance software-defined S3 compatible object storage. The target files are generated on a monthly basis via github actions using `targets/spatial_targets.R` workflow. The files can be downloaded with the `spat4cast_get_targets` function (??Should this just grab the latest target file or all target files??).
+
 
 
 ## 3.4 Create the training dataset
 
+One sources of information about the fire are burn severity metrics, The USGS maintains a [Burn Severity Portal](https://burnseverity.cr.usgs.gov/products) with great documentation outlining available data products.
 
 
 ## 3.5 Example forecasts: some simple models
