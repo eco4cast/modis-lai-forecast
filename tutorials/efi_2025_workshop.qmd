@@ -256,18 +256,12 @@ raster_cube <- ingest_planetary_data(start_date = "2015-01-01",
                                      asset_name = "Lai_500m")
 ```
 
-```{r, include=FALSE}
+```{r}
 # Forecast ----------------------------------------------------------------
 library(minioclient)
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
                                           date = '2025-03-01',
                                           dir = 'climatology')
-
-install_mc()
-mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
-
-ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsmith')
 ```
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
@@ -287,10 +281,6 @@ We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` functio
 ```{r, eval = T}
 parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
                                           dir = 'gsarima')
-
-parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'johnsmith')
-
 ```
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
@@ -301,7 +291,16 @@ Does this forecast seem reasonable?
 
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
+```{r, eval = FALSE}
+install_mc()
+mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
 
+ensemble_forecast_dir |>
+  spat4cast_submit(model_id = 'johnsmith')
+
+parametric_forecast_dir1 |>
+  spat4cast_submit(model_id = 'johnsmith')
+```
 
 
 # 4 Evaluating your forecast

@@ -197,8 +197,8 @@ The main branch currently has two baseline models implemented. These models are 
 - A grid ARIMA parametric model
 
 We also have two baseline models in the development and debugging stage:
-- A spatial-temporal ICAR random walk
-- A spatial Gaussian Process 
+- A spatio-temporal ICAR random walk
+- A spatio-temporal Gaussian Process 
 
 For now, the first two models that we have implemented will provide reasonable competitors to the models developed by challenge participants, and in the context of this workshop will provide a nice demonstration of the difference between parametric and ensemble models and how they are scored.
 
@@ -236,7 +236,7 @@ In many situations, the climatology or local climatology models perform surprisi
 Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = FALSE}
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(tidyverse)
 suppressPackageStartupMessages(source("../packages.R"))
@@ -262,18 +262,12 @@ raster_cube <- ingest_planetary_data(start_date = "2015-01-01",
                                      asset_name = "Lai_500m")
 ```
 
-```{r, include=FALSE}
+```{r}
 # Forecast ----------------------------------------------------------------
 library(minioclient)
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
                                           date = '2025-03-01',
                                           dir = 'climatology')
-
-install_mc()
-mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
-
-ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsmith')
 ```
 
 
@@ -285,20 +279,16 @@ If we are in the business of providing technical definitions: a time series $x =
 \begin{align*}
 \phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
 \end{align*}
-(do we need this? can I just link to other SARIMA material?). For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
+For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
 
 There are a number of quantities that require estimation within each grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ as well as estimates of their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
 
-We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to for pipeline purposes. 
 
 
 ```{r, eval = T}
 parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
                                           dir = 'gsarima')
-
-parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'johnsmith')
-
 ```
 
 
@@ -310,6 +300,17 @@ Does this forecast seem reasonable?
 
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
+
+```{r, eval = FALSE}
+install_mc()
+mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
+
+ensemble_forecast_dir |>
+  spat4cast_submit(model_id = 'johnsmith')
+
+parametric_forecast_dir1 |>
+  spat4cast_submit(model_id = 'johnsmith')
+```
 
 
 
@@ -323,6 +324,13 @@ Submissions are scored using two different proper scoring rules (Gneiting and Ra
 \text{CRPS}(y) &= \int_{\mathbb{R}} (F(z) - \mathbbm{1}_{z \geq y} )^2 dz 
 \end{align}
 The LogS and CRPS are computed for each grid cell in the target. The individual values for each grid cell are saved, and are useful for visualizing particular areas where the forecast model is performing well or poorly. The final value reported for the challenge is simply the mean value of the respective scores across all grid cells. 
+
+There are two broad categories of "types" of forecasts that can be submitted for scoring, and our examples so far have been demonstrative of the differences. 
+
+- _Ensemble forecasts_ 
+- _Parametric forecasts_
+
+These forecasts are handled slightly differently in terms of how they are scored. Unsurprisingly, ensemble forecast submissions are scored using the `scoring_spat_ensemble` function and parametric forecasts are scored using the `scoring_spat_parametric` function. 
 
 
 ## 4.2 How to score your own forecast
