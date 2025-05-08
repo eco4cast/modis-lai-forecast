@@ -39,7 +39,7 @@ spat4cast_score_submit <- function(dir,
   # minioclient::mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "") # keys not needed for public bucket submission
   
   file_names <- basename(submitted_files)
-  out <- glue::glue("efi/spat4cast-scores/variable={variable}/site_id={site_id}/model_id={model_id}/reference_date={reference_date}") 
+  out <- glue::glue("efi/spat4cast-scores/duration=P1M/variable={variable}/site_id={site_id}/model_id={model_id}/reference_date={reference_date}") 
   
   submit <- purrr::walk(file_names, ~withr::with_dir(dir, minioclient::mc_cp(from = ., out, recursive = TRUE)))
   

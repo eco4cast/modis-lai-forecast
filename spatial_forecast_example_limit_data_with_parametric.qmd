@@ -132,8 +132,8 @@ climatology_scored_forecast_dir |>
 parametric_scored_forecast_dir |>
   spat4cast_score_submit("arima-grid-model")
 
-# mc_mirror("scores_climatology/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/model_id=climatology-model\reference_date=")
+# mc_mirror("scores_climatology/", "efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/model_id=climatology-model\reference_date=")
 # 
-# mc_mirror("scores_parametric/", "efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/model_id=arima-grid-model/reference_date=")
+# mc_mirror("scores_parametric/", "efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/model_id=arima-grid-model/reference_date=")
 
 ```

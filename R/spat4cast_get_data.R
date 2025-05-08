@@ -39,7 +39,7 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
   dir.create("files")
   
   # Copy files from miniobucket
-  mc_cp(paste0("efi/spat4cast-data/variable=lai_recovery/site_id=",fire,"/"), "files", recursive = TRUE)
+  mc_cp(paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), "files", recursive = TRUE)
   
   # extract dates from copied files
   d <-str_extract(dir_ls("files/"), "(?<=/).*(?=\\.)")
