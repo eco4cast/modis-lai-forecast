@@ -19,7 +19,6 @@
 spat4cast_get_data <- function(start_date = "2002-01-01",
                                   end_date = "2025-03-01",
                                   fire,
-                                  box,
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
                                   srs = "EPSG:4326",
@@ -28,6 +27,10 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
                                   dt = "P30D",
                                   aggregation = "mean",
                                   resampling = "near"){
+  
+  # Get Bounding box for fire
+  fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = '../shp')
+  box <- fire_box$bbox
   
   # check box
   assertthat::are_equal(length(box), 4)
