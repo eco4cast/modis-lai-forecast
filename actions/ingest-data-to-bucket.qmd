@@ -16,7 +16,7 @@ library(gdalcubes)
 ```
 
 ```{r}
-fire <- "sawmill"
+for(fire in c(list.files("../shp"))){
 
 # list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
@@ -120,5 +120,6 @@ d <- gdalcubes::dimension_values(raster_cube)
 mat <- gdalcube_to_matrix(raster_cube, d)
 
 sum(!is.na(mat))
+}
 
 ```
