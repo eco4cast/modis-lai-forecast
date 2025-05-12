@@ -7,7 +7,7 @@ fire <- "sawmill"
 
 # list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
-fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = "/shp")
+fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = "shp")
 ## turn parallelization on
 gdalcubes::gdalcubes_options(parallel=TRUE)
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and Mar 1 2023. Loop through 5 year increments to avoid ingest_planetary_data timing out.
