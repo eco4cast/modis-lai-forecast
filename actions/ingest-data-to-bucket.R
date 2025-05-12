@@ -83,7 +83,7 @@ dir.create("cube")
 # 
 # write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
-raster_cube <- ingest_planetary_data(start_date = "2025-05-01",
+raster_cube <- ingest_planetary_data(start_date = "2025-03-01",
                                      end_date = Sys.Date(),
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
