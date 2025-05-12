@@ -5,13 +5,15 @@ library(lubridate)
 library(gdalcubes)
 library(rstac)
 library(stars)
+library(assertthat)
 
 #Source functions
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 # devtools::load_all()
 
 dir = "targets"
-site_id = c("august_complex")[1]
+set_Site <- list.dirs("./shp", full.names = F,recursive = F)
+site_id = set_Site[2]
 dt = "P1M"
 dx = 0.1
 dy = 0.1
