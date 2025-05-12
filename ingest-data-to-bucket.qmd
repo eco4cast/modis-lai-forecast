@@ -42,7 +42,7 @@ raster_cube <- ingest_planetary_data(start_date = "2002-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "")
+write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 raster_cube <- ingest_planetary_data(start_date = "2007-01-01",
                                      end_date = "2012-01-01",
@@ -55,7 +55,7 @@ raster_cube <- ingest_planetary_data(start_date = "2007-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "")
+write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 raster_cube <- ingest_planetary_data(start_date = "2012-01-01",
                                      end_date = "2017-01-01",
@@ -68,7 +68,7 @@ raster_cube <- ingest_planetary_data(start_date = "2012-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "")
+write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
                                      end_date = "2022-01-01",
@@ -81,7 +81,7 @@ raster_cube <- ingest_planetary_data(start_date = "2017-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "")
+write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
                                      end_date = "2025-05-01",
@@ -94,7 +94,7 @@ raster_cube <- ingest_planetary_data(start_date = "2022-01-01",
                                      asset_name = "Lai_500m")
 
 
-write_tif(raster_cube, dir = "cube", prefix = "")
+write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 mc_cp("cube/", paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=", fire,"/"), recursive = TRUE)
 
@@ -106,7 +106,6 @@ mc_cp("cube/", paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/sit
 raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
                                   end_date = "2025-05-01",
                                   fire = fire,
-                                  fire_box$bbox,
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
                                   srs = "EPSG:4326",

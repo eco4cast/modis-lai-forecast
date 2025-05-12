@@ -40,7 +40,7 @@ spat_arima_grid <- function(cuberast, dir = 'parametric', target){
   
   # Read in data matrix
   #mat_dat <- read_csv(data_csv, na =c("", "NA", "0"))
-  mat_dat <- gdalcube_to_matrix(cube = cuberast, 
+  mat_dat <- gdalcube_to_matrix2(cube = cuberast, 
                                 d = gdalcubes::dimension_values(raster_cube))
   
   # Load target raster

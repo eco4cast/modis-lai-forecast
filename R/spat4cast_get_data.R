@@ -19,7 +19,6 @@
 spat4cast_get_data <- function(start_date = "2002-01-01",
                                   end_date = "2025-03-01",
                                   fire,
-                                  box,
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
                                   srs = "EPSG:4326",
@@ -28,6 +27,10 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
                                   dt = "P30D",
                                   aggregation = "mean",
                                   resampling = "near"){
+  
+  # Get Bounding box for fire
+  fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = '../shp')
+  box <- fire_box$bbox
   
   # check box
   assertthat::are_equal(length(box), 4)
@@ -42,7 +45,7 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
   mc_cp(paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), "files", recursive = TRUE)
   
   # extract dates from copied files
-  d <-str_extract(dir_ls("files/"), "(?<=/).*(?=\\.)")
+  d <-str_extract(dir_ls("files/"), "(?<=/Lai_500m_).*(?=\\.)")
   
   # set dimensions of the cube
   v <- gdalcubes::cube_view(srs = srs, #lat/lon
