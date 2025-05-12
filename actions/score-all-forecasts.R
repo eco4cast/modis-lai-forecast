@@ -1,24 +1,8 @@
----
-title: "Apply Scores to Forecasts"
-author: "Will"
-format:
-  html:
-    embed-resources: TRUE
-editor: visual
----
-
-```{r message = FALSE}
-knitr::opts_chunk$set(message=FALSE, warning = FALSE)
+#Source packages and functions
 suppressPackageStartupMessages(source("../packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
-```
 
-## Lets apply scoring rules to all of the Forecasts
-
-```{r}
-library(minioclient)
-library(stringr)
-install_mc()
+# Apply scoring functions to unscored forecasts
 
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
 
@@ -62,14 +46,14 @@ subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
 
 if(length(subs_to_score) > 0){
-subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
+  subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
   for(i in subs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
     #dir <- str_sub(i, 1L, end = -2L)
     dir.create("files")
     mc_cp(i, "files", recursive = TRUE)
-  
+    
     file_names <- mc_ls(i)
     parametric_ind <- if_else(1 %in% str_detect(file_names, c("lognormal|normal|bernoulli|beta|uniform|gamma|logistic|exponential|poisson")) == TRUE, 1, 0)
     if(parametric_ind == 1){
@@ -81,36 +65,3 @@ subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_rec
     }
   }
 }else{}
-
-```
-
-## Lets Get visualizations of each of the scored forecasts
-
-```{r}
-scored <- mc_ls("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
-
-scored <- unique(str_extract(scored, ".*/reference_date=.*/"))
-scored <- paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", scored)
-for (j in scored){
-  model_id <- str_extract(j, "(?<=model_id=).*(?=/reference_date=)")
-  ref_date <- str_extract(j, "(?<=reference_date=).*(?=/)" )
-  #dir <- str_sub(i, 1L, end = -2L)
-  dir.create("files")
-  mc_cp(j, "files", recursive = TRUE)
-  file_names <- mc_ls(j)
-   
-  for( i in file_names){
-    if(str_detect(i, "crps") == TRUE){
-      temp_rast <- rast(paste0("files/",i))
-      plot(temp_rast, main = paste0("CRPS Score for ", model_id,"-",ref_date))
-    }else{
-      temp_rast <- rast(paste0("files/",i))
-      plot(temp_rast, main = paste0("LOG Score for ", model_id,"-",ref_date))
-    }
-  }
-}
-
-
-
-
-```

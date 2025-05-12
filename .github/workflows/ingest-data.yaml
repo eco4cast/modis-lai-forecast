@@ -40,6 +40,6 @@ jobs:
         run: |
           Sys.setenv("R_USER_DATA_DIR"=tempdir())
           minioclient::install_mc()
-          quarto::quarto_render("actions/ingest-data-to-bucket.R")
+          source("actions/ingest-data-to-bucket.R")
           
       
