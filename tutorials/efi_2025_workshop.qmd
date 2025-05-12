@@ -208,6 +208,10 @@ target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
 
 ## 3.3 Visualise the target data
 
+```{r}
+tg <- rast(target_dir)
+plot(tg)
+```
 
 ## 3.4 Create the training dataset
 
