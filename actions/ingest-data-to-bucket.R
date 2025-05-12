@@ -1,5 +1,5 @@
 #Source packages and functions
-suppressPackageStartupMessages(source("../packages.R"))
+suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 install_mc()
 
