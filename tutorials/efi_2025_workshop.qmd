@@ -7,7 +7,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+library(tidyverse)
+suppressPackageStartupMessages(source("../packages.R"))
 ```
+
 # 1 About this tutorial
 
 ## 1.1 Learning objectives
@@ -109,6 +113,7 @@ library(minioclient)
 library(purrr)
 library(remotes)
 library(neon4cast)
+library(minioclient)
 ```
 
 # 2 Introduction
@@ -180,6 +185,26 @@ up to 3 months ahead on a monthly time step.w
 
 ## 3.2 Read in the data
 
+To read and write to the forecast cloud, we use functions with the prefix "spat4cast_". We can use `spat4cast_get_data()` to read in a RasterCube object with the provided time series of LAI measurements, and `spat4cast_get_target()` to read in a target for our forecast. 
+
+```{r}
+raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
+                                  end_date = "2025-05-01",
+                                  fire = "august_complex",
+                                  collection = "modis-15A2H-061",
+                                  asset_name = "Lai_500m",
+                                  srs = "EPSG:4326",
+                                  dx = 0.1, 
+                                  dy = 0.1, 
+                                  dt = "P30D",
+                                  aggregation = "mean",
+                                  resampling = "near")
+
+target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
+
+```
+
+
 
 ## 3.3 Visualise the target data
 
@@ -230,12 +255,6 @@ In many situations, the climatology or local climatology models perform surprisi
 
 Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
 
-```{r, echo = FALSE, include = FALSE}
-for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
-library(tidyverse)
-suppressPackageStartupMessages(source("../packages.R"))
-```
-
 ```{r}
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
@@ -246,7 +265,7 @@ gdalcubes::gdalcubes_options(parallel=TRUE)
 
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
 raster_cube <- ingest_planetary_data(start_date = "2015-01-01", 
-                                     end_date = "2025-03-01", 
+                                     end_date = "2025-03-01",
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
                                      dx = 0.1, 
@@ -279,8 +298,27 @@ There are a number of quantities that require estimation within each grid cell. 
 We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to for pipeline purposes. 
 
 ```{r, eval = T}
+raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
+                                  end_date = "2025-05-01",
+                                  fire = "august_complex",
+                                  collection = "modis-15A2H-061",
+                                  asset_name = "Lai_500m",
+                                  srs = "EPSG:4326",
+                                  dx = 0.1, 
+                                  dy = 0.1, 
+                                  dt = "P30D",
+                                  aggregation = "mean",
+                                  resampling = "near")
+
+# dir.create("target")
+# 
+# mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
+# 
+# mc_cp("efi/spat4cast-targets/duration=P1M/variable=lai_recovery/site=august_complex/lai_recovery-target-2025-04-01.tif", "target")
+
 parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
-                                          dir = 'gsarima')
+                                          dir = 'gsarima',
+                                          target  = target_dir)
 ```
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
