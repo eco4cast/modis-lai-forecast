@@ -17,7 +17,7 @@ library(gdalcubes)
 
 ```{r}
   
-fire <- "creek"
+fire <- "east_troublesome"
 
 # list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
