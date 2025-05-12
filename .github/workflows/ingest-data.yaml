@@ -38,8 +38,10 @@ jobs:
       - name: Run example
         shell: Rscript {0}
         run: |
-          Sys.setenv("R_USER_DATA_DIR"=tempdir())
-          minioclient::install_mc()
           source("actions/ingest-data-to-bucket.R")
+        env: 
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: "spatial-team"
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       
