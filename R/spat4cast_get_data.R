@@ -29,7 +29,7 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
                                   resampling = "near"){
   
   # Get Bounding box for fire
-  fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = '../shp')
+  fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = './shp')
   box <- fire_box$bbox
   
   # check box
