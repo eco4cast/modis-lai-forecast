@@ -8,7 +8,7 @@ editor: visual
 
 ```{r message = FALSE}
 knitr::opts_chunk$set(message=FALSE, warning = FALSE)
-suppressPackageStartupMessages(source("packages.R"))
+suppressPackageStartupMessages(source("../packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 library(minioclient) # remotes::install_github("cboettig/minioclient")
 install_mc()
