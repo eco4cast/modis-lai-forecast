@@ -3,7 +3,7 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 mc_alias_set("efi", "data.ecoforecast.org",
-             "spatial-team", "EXk4HARe6AXoZRR3uVwQ")
+             Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
 
 #for(fire in c(list.files("shp"))){
