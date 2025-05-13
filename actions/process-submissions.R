@@ -10,6 +10,9 @@ mc_alias_set("efi", "data.ecoforecast.org",
              "spatial-team", "EXk4HARe6AXoZRR3uVwQ")
 
   
+# for(fire in list.files("shp")){
+#   if(length(mc_ls(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"))) > 0){
+  
 fire <- "august_complex"
   
   submitted <- mc_ls(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
@@ -28,4 +31,7 @@ fire <- "august_complex"
     writeRaster(temp_rast, paste0("forecasts/",forecast_file), filetype = "COG", overwrite = TRUE)
     mc_cp(paste0("forecasts/",forecast_file), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=",ref_date,"/"), recursive = TRUE)
   }
+
+#   }else{}
+# }
 
