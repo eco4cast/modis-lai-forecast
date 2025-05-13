@@ -7,7 +7,8 @@ install_mc()
 
 fire <- "august_complex"
 # Get date for the relevant monthly target
-date <- lubridate::floor_date(as.Date(Sys.time()), "month")
+# date <- lubridate::floor_date(as.Date(Sys.time()), "month")
+date <- "2025-04-01"
 
 target <- spat4cast_get_target(date = date, fire = fire)
 
