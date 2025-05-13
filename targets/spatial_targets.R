@@ -10,8 +10,11 @@ library(stars)
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 # devtools::load_all()
 
+# loop through target sites
+for(fire in c(list.files("shp"))){
+
 dir = "targets"
-site_id = c("august_complex")[1]
+site_id = fire
 dt = "P1M"
 dx = 0.1
 dy = 0.1
@@ -52,5 +55,6 @@ target <- create_target_file(cuberast = raster_cube,
                              mask = fire_box$maskLayer,
                              dt = dt,
                              var = "LAI_modis")
-                             
+
+}
                              
