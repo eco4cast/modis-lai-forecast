@@ -51,5 +51,6 @@ if(length(fcs_to_score) > 0){
       score_dir <- scoring_spat_ensemble("files", target, "score_dir")
       spat4cast_score_submit(score_dir, model_id, reference_date = ref_date)
     }
+    unlink("files/*")
   }
 }else{}
