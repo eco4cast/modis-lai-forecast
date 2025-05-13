@@ -10,8 +10,8 @@ library(stars)
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 # devtools::load_all()
 
-# loop through target sites
-for(fire in c(list.files("shp"))){
+# input target sites
+fire <- "sawmill"
 
 dir = "targets"
 site_id = fire
@@ -56,5 +56,4 @@ target <- create_target_file(cuberast = raster_cube,
                              dt = dt,
                              var = "LAI_modis")
 
-}
                              
