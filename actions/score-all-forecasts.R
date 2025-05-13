@@ -1,6 +1,7 @@
 #Source packages and functions
 suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+install_mc()
 
 # Apply scoring functions to unscored forecasts
 for(fire in c(list.files("shp"))){
