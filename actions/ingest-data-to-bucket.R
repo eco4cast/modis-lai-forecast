@@ -98,4 +98,5 @@ write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 
 mc_cp("cube/", paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=", fire,"/"), recursive = TRUE)
 
+unlink("cube/*")
 }
