@@ -10,9 +10,11 @@ install_mc()
 
 date <- "2025-04-01"
 
+fire <- "august_complex"
+
 target <- spat4cast_get_target(date = date, fire = fire)
 
-fire <- "august_complex"
+
 
 # Look through submitted forecasts and identify which have no score
 
