@@ -32,7 +32,7 @@ create_target_file <- function(
     mask = NULL,
     bucket = NULL,
     dt = "P1M",
-    var = "LAI_modis"
+    var = "lai_recovery"
 )
   {
   
