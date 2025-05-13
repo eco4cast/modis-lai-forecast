@@ -19,12 +19,13 @@ fire <- "august_complex"
   mc_cp(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), "submissions",recursive =  TRUE)
   
   for (i in 1:length(submitted)){
-    forecast <- str_extract(submitted[i], "(?<=reference_date=.{10}/).*")
+    model_id <- str_extract(submitted[i], "(?<=model_id=).*(?=/)")
     ref_date <- str_extract(submitted[i], "(?<=reference_date=).*(?=/)")
+    forecast_file <- str_extract(submitted[i], "(?<=reference_date=.{10}/).*")
     
     dir.create("forecasts")
     temp_rast <- rast(paste0("submissions/", submitted[i]))
-    writeRaster(temp_rast, paste0("forecasts/",forecast), filetype = "COG", overwrite = TRUE)
-    mc_cp(paste0("forecasts/",forecast), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/reference_date=",ref_date,"/",forecast), recursive = TRUE)
+    writeRaster(temp_rast, paste0("forecasts/",forecast_file), filetype = "COG", overwrite = TRUE)
+    mc_cp(paste0("forecasts/",forecast_file), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=",ref_date,"/",forecast_file), recursive = TRUE)
   }
 
