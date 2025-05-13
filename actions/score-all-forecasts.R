@@ -1,42 +1,24 @@
 #Source packages and functions
-suppressPackageStartupMessages(source("../packages.R"))
+suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 # Apply scoring functions to unscored forecasts
+for(fire in c(list.files("shp"))){
+# fire <- "august_complex"
+# Get date for the relevant monthly target
+date <- lubridate::floor_date(as.Date(Sys.time()), "month")
 
-fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE)
+target <- spat4cast_get_target(date = date, fire = fire)
 
-# Ingest data ------------------------------------------------------------
-gdalcubes::gdalcubes_options(parallel=TRUE)
 
-# use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
-raster_cube <- ingest_planetary_data(start_date = "2019-01-01", 
-                                     end_date = "2023-07-01", 
-                                     box = fire_box$bbox,
-                                     srs = "EPSG:4326",
-                                     dx = 0.1, 
-                                     dy = 0.1, 
-                                     dt = "P30D",
-                                     collection = "modis-15A2H-061",
-                                     asset_name = "Lai_500m")
-
-# create target file
-date <- '2023-06-01'
-
-target <- create_target_file(cuberast = raster_cube,
-                             date = date,
-                             dir = "/vsis3/spat4cast-targets",
-                             mask = fire_box$maskLayer)
-
-# target <- "lai_recovery-target-2023-05-10.tif"
-
+# Look through submitted forecasts and identify which have no score
 
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-submitted <- mc_ls("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+submitted <- mc_ls(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
-scored <- mc_ls("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+scored <- mc_ls(paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
 submitted <- unique(str_extract(submitted, ".*/reference_date=.*(?=/)"))
 
@@ -44,9 +26,10 @@ scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
 
 subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
+# Loop through unscored forecasts and get scores
 
 if(length(subs_to_score) > 0){
-  subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
+  subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/",subs_to_score,"/")
   for(i in subs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
@@ -65,3 +48,4 @@ if(length(subs_to_score) > 0){
     }
   }
 }else{}
+}

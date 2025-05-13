@@ -6,7 +6,7 @@ on:
     - cron: '0 1 1 * *' # runs on first of month
   workflow_dispatch:
 
-name: score-forecasts
+name: process-submissions
 
 jobs:
   docker:
@@ -38,7 +38,7 @@ jobs:
       - name: run R script
         shell: Rscript {0}
         run: |
-          source("actions/score-all-forecasts.R")
+          source("actions/process-submissions.R")
         env: 
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: "spatial-team"

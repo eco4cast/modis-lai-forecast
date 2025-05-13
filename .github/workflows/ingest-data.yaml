@@ -35,7 +35,7 @@ jobs:
         shell: Rscript {0}
         run: install.packages(c("quarto", "scoringRules", "minioclient", "rstac", "gdalcubes", "here", "forecast"))
         
-      - name: Run example
+      - name: run R script
         shell: Rscript {0}
         run: |
           source("actions/ingest-data-to-bucket.R")
