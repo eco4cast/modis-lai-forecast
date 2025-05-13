@@ -6,11 +6,11 @@ install_mc()
 # Apply scoring functions to unscored forecasts
 
 # Get date for the relevant monthly target
-target_date <- lubridate::floor_date(as.Date(Sys.time()), "month") %m-% months(1)
-
+# target_date <- lubridate::floor_date(as.Date(Sys.time()), "month") %m-% months(1)
+date <- "2025-04-01"
 fire <- "august_complex"
 
-# target <- spat4cast_get_target(date = date, fire = fire)
+target <- spat4cast_get_target(date = date, fire = fire)
 
 
 
@@ -38,13 +38,13 @@ if(length(fcs_to_score) > 0){
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
     ref_date_floor <- lubridate::floor_date(as.Date(ref_date), "month")
     
-    if(ref_date_floor == target_date){
-      date <- ref_date_floor
-      target <- spat4cast_get_target(date = date, fire = fire) 
-    }else{
-      date <- target_date
-      target <- spat4cast_get_target(date = date, fire = fire) 
-    }
+    # if(ref_date_floor == target_date){
+    #   date <- ref_date_floor
+    #   target <- spat4cast_get_target(date = date, fire = fire) 
+    # }else{
+    #   date <- target_date
+    #   target <- spat4cast_get_target(date = date, fire = fire) 
+    # }
     
     
     #dir <- str_sub(i, 1L, end = -2L)
