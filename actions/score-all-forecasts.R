@@ -17,21 +17,21 @@ target <- spat4cast_get_target(date = date, fire = fire)
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-submitted <- mc_ls(paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
+forecasts <- mc_ls(paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
 scored <- mc_ls(paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
-submitted <- unique(str_extract(submitted, ".*/reference_date=.*(?=/)"))
+forecasts <- unique(str_extract(forecasts, ".*/reference_date=.*(?=/)"))
 
 scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
 
-subs_to_score <- submitted[which(submitted %in% scored == 0)]
+fcs_to_score <- forecasts[which(forecasts %in% scored == 0)]
 
-# Loop through unscored submissions and get scores
+# Loop through unscored forecasts and get scores
 
-if(length(subs_to_score) > 0){
-  subs_to_score <- paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/",subs_to_score,"/")
-  for(i in subs_to_score){
+if(length(fcs_to_score) > 0){
+  fcs_to_score <- paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/",fcs_to_score,"/")
+  for(i in fcs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
     #dir <- str_sub(i, 1L, end = -2L)
