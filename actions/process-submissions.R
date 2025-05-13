@@ -19,7 +19,7 @@ fire <- "august_complex"
   mc_cp(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), "submissions",recursive =  TRUE)
   
   for (i in 1:length(submitted)){
-    model_id <- str_extract(submitted[i], "(?<=model_id=).*(?=/)")
+    model_id <- str_extract(submitted[i], "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(submitted[i], "(?<=reference_date=).*(?=/)")
     forecast_file <- str_extract(submitted[i], "(?<=reference_date=.{10}/).*")
     
