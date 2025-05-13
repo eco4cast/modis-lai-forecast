@@ -21,6 +21,14 @@ spat4cast_get_target <- function(date = "2025-04-01", fire = "august_complex"){
   # set mc_alias
   mc_alias_set("efi", "data.ecoforecast.org", "", "")
   
+  target_date <- lubridate::floor_date(as.Date(date), "month")
+  
+  if(date>target_date){
+    print(paste0("Warning: Requested date ", date, " is not a target. Pulling target ", target_date, " instead."))
+    date <- target_date
+  }
+  
+  
   # create temporary directory to hold files
   dir.create("target")
   
