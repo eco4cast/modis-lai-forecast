@@ -4,8 +4,8 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 install_mc()
 
 # Apply scoring functions to unscored forecasts
-for(fire in c(list.files("shp"))){
-# fire <- "august_complex"
+
+fire <- "august_complex"
 # Get date for the relevant monthly target
 date <- lubridate::floor_date(as.Date(Sys.time()), "month")
 
@@ -17,7 +17,7 @@ target <- spat4cast_get_target(date = date, fire = fire)
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-submitted <- mc_ls(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
+submitted <- mc_ls(paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
 scored <- mc_ls(paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
 
@@ -27,10 +27,10 @@ scored <- unique(str_extract(scored, ".*/reference_date=.*(?=/)"))
 
 subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
-# Loop through unscored forecasts and get scores
+# Loop through unscored submissions and get scores
 
 if(length(subs_to_score) > 0){
-  subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/",subs_to_score,"/")
+  subs_to_score <- paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/",subs_to_score,"/")
   for(i in subs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
@@ -49,4 +49,3 @@ if(length(subs_to_score) > 0){
     }
   }
 }else{}
-}

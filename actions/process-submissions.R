@@ -7,9 +7,7 @@ mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
 
-#for(fire in c(list.files("shp"))){
-
-  fire <- "august_complex"
+for(fire in c(list.files("shp"))){
   
   submitted <- mc_ls(paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), recursive = TRUE)
   
@@ -25,4 +23,4 @@ mc_alias_set("efi", "data.ecoforecast.org",
     writeRaster(temp_rast, paste0("forecasts/",forecast), filetype = "COG", overwrite = TRUE)
     mc_cp(paste0("forecasts/",forecast), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/",submitted[i]), recursive = TRUE)
   }
-#}
+}
