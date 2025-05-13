@@ -5,13 +5,14 @@ install_mc()
 
 # Apply scoring functions to unscored forecasts
 
-fire <- "august_complex"
 # Get date for the relevant monthly target
-# date <- lubridate::floor_date(as.Date(Sys.time()), "month")
+# date <- lubridate::floor_date(as.Date(Sys.time()), "month") %m-% months(1)
+
 date <- "2025-04-01"
 
 target <- spat4cast_get_target(date = date, fire = fire)
 
+fire <- "august_complex"
 
 # Look through submitted forecasts and identify which have no score
 
