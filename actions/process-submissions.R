@@ -26,6 +26,6 @@ fire <- "august_complex"
     dir.create("forecasts")
     temp_rast <- rast(paste0("submissions/", submitted[i]))
     writeRaster(temp_rast, paste0("forecasts/",forecast_file), filetype = "COG", overwrite = TRUE)
-    mc_cp(paste0("forecasts/",forecast_file), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=",ref_date,"/",forecast_file), recursive = TRUE)
+    mc_cp(paste0("forecasts/",forecast_file), paste0("efi/spat4cast-forecasts/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=",ref_date,"/"), recursive = TRUE)
   }
 
