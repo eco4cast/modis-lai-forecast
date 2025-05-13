@@ -3,7 +3,7 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 install_mc()
 
-fire <- "sawmill"
+for(fire in c(lis.tfiles("shp"))){
 
 # list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
@@ -99,3 +99,5 @@ write_tif(raster_cube, dir = "cube", prefix = "Lai_500m_")
 mc_cp("cube/", paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=", fire,"/"), recursive = TRUE)
 
 unlink("cube/*")
+
+}
