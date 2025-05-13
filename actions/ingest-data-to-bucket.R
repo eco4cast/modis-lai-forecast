@@ -3,7 +3,7 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 install_mc()
 
-for(fire in c(lis.tfiles("shp"))){
+for(fire in c(list.files("shp"))){
 
 # list.files(here::here("~/Projects/modis-lai-forecast/R"), full.names = TRUE)
 ## read in fire bounding box
