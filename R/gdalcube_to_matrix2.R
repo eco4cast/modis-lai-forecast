@@ -12,7 +12,7 @@
 
 
 ## function to extract nimble matrix
-gdalcube_to_matrix2 <- function(cube, d, threshold = 12, dir = '../GeoTiffs/'){
+gdalcube_to_matrix2 <- function(cube, d, threshold = 12){
   ## Outputs:
   ## nimble_mat: matrix of LAI values indexed by time to be
   ## passed to nimble to fit the baseline spatio-temporal
