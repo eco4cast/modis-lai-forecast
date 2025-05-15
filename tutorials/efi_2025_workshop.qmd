@@ -498,10 +498,10 @@ install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
 
 ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsmith')
+  spat4cast_submit(model_id = 'johnsemble')
 
 parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'johnsmith')
+  spat4cast_submit(model_id = 'parametsmith')
 ```
 
 # 4 Evaluating your forecast
