@@ -535,17 +535,23 @@ scored.
 
 **Parametric forecasts** are forecast distributions that can be described by a probability distribution with a finite set of parameters. For example, a Gaussian forecast distribution with a specified mean and standard deviation would be a parametric forecast. In the context of our spatio-temporal forecasting challenge, this can come across in a few different ways. For example, we may have parametric forecast distributions for each individual grid cell (such as our example auto SARIMA forecasts), or a multivariate distribution that jointly describes the grid such as a Multivariate Normal distribution. When deciding what method to use to score challenge submissions, we search the name of the submission raster for any of the following words: 
 
-- Lognormal 
-- Normal 
-- Bernoulli 
-- Beta 
-- Uniform 
-- Gamma 
-- Logistic 
-- Exponential 
-- Poisson 
+- lognormal 
+- normal 
+- bernoulli 
+- beta 
+- uniform 
+- gamma 
+- logistic 
+- exponential 
+- poisson 
 
 If any of these words are present in the file naming convention for a particular forecast, the scoring pipeline will pull these files out and use the named probability distribution to analytically compute values for the CRPS and LogS.
+
+For two parameter distributions, parametric forecasts submissions can be submitted as one or two GeoTiff files. If two .tifs are being submitted, the names of the file should be "{distribution}_{parameter}_forecast.tif". The whole file name should be lowercase, but the layers within each .tif do not need to be named. 
+
+If a single .tif is being submitted, the file name should be "{distribution}_forecast.tif", and the layer names must correspond with the appropriate parameter.
+
+For parametric distributions which require only one parameter (poisson, exponential, bernoulli), either naming scheme may be used. 
 
 **Ensemble forecasts**, like the local climatology baseline model from
 Section 3.5.1, provide numerous different individual forecasts. These
