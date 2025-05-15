@@ -258,8 +258,8 @@ fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 
 ## 3.2 Read in the data
 
-To read and write to the forecast cloud, we use functions with the
-prefix "spat4cast\_". We can use `spat4cast_get_data()` to read in a
+To facilitate spatio-temporal forecasting at the sites of interest for this challenge, time series data of 500m LAI measurements are stored in a MinIO bucket. MinIO is high-performance
+software-defined S3 compatible object storage. To read and write to the forecast cloud, we use functions with the prefix "spat4cast\_". We can use `spat4cast_get_data()` to read in a
 RasterCube object with the provided time series of LAI measurements, and
 `spat4cast_get_target()` to read in a target for our forecast.
 
@@ -282,8 +282,7 @@ target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
 
 ## 3.3 Visualise the target data
 
-The target data are stored in MInIO bucket. MinIO is high-performance
-software-defined S3 compatible object storage. The target files are
+The target data are also stored in MinIO bucket.  The target files are
 generated on a monthly basis via github actions using
 `targets/spatial_targets.R` workflow. The files can be downloaded with
 the `spat4cast_get_targets` function.
@@ -294,6 +293,13 @@ plot(tg)
 ```
 
 ## 3.4 Create the training dataset
+
+For some modelling approaches, a gdalcubes "RasterCube" format may be appropriate (e.g. ensemble climatology). For other modelling approaches though, it may be more straightforward to use the spatial time series data as a matrix or array. The `gdalcube_to_matrix2` function will transform a RasterCUbe object into a matrix, where rows correspond to time slices, and columns correspond to gridcells. The threshold argument sets a limit at which high measurements are set to NA. 
+
+```{r}
+data_matrix <- gdalcube_to_matrix2(raster_cube, threshold = 12 )
+```
+
 
 ## 3.5 Example forecasts: some simple models
 
