@@ -3,6 +3,9 @@ title: "EFI_2025_Workshop"
 author: "John Smith, Will Hammond, Chris Jones, David Durden"
 date: "2025-04-17"
 output: html_document
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -17,20 +20,21 @@ suppressPackageStartupMessages(source("../packages.R"))
 ## 1.1 Learning objectives
 
 <!-- -   Overview of the [Post Fire Recovery - MODIS LAI](https://projects.ecoforecast.org/neon4cast-docs/) -->
+
 <!--     theme for the [NEON Ecological Forecast Challenge](https://projects.ecoforecast.org/neon4cast-ci/) -->
+
 -   How to download the necessary data from Planetary Computer
 -   How to create a simple forecast for the Post Fire Recovery theme
 -   How to submit/score a forecast to evaluate its accuracy
-
 
 ## 1.2 Target user groups for this tutorial
 
 This tutorial is intended to be used by ecological forecasters at any
 stage of expertise and may be used as a learning tool as an introduction
-to forecasting properties of ecological processes spatially and temporally.
-Below, we provide code for introductory examples to walk through the
-entire process of creating and submitting a forecast to the Ecological 
-Forecasting challenge. This includes:
+to forecasting properties of ecological processes spatially and
+temporally. Below, we provide code for introductory examples to walk
+through the entire process of creating and submitting a forecast to the
+Ecological Forecasting challenge. This includes:
 
 1.  Accessing target datasets of MODIS LAI.
 2.  Accessing climate forecast data to use as drivers in models
@@ -39,8 +43,8 @@ Forecasting challenge. This includes:
 4.  How to submit a forecast to the forecast challenge
 
 Upon completing this tutorial, participants should be able to create and
-submit forecasts to the MODIS LAI Post Fire Recovery theme of the EFI RCN NEON
-Ecological Forecasting challenge.
+submit forecasts to the MODIS LAI Post Fire Recovery theme of the EFI
+RCN NEON Ecological Forecasting challenge.
 
 ## 1.3 Things you will need to complete this tutorial
 
@@ -94,7 +98,9 @@ Then load the packages.
 version$version.string
 ```
 
-    ## [1] "R version 4.3.1 (2023-06-16 ucrt)"
+```         
+## [1] "R version 4.3.1 (2023-06-16 ucrt)"
+```
 
 ``` r
 library(tidyverse)
@@ -121,71 +127,152 @@ library(minioclient)
 ## 2.1 [The NEON Ecological Forecast Challenge](https://projects.ecoforecast.org/neon4cast-ci/)
 
 The Challenge has been organized by the Ecological Forecasting
-Initiative Research Coordination Network ([EFI RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are the first to set up a system to continually compile and score community generated forecasts for true out of sample data prior to data collection. *Some additional comments about the temporal challenge here*. Questions about ecosystems and ecosystem services are inherently focused on the future because they involve understanding how natural systems will respond to changing environmental, social, and economic conditions over time. Commonly ecosystems are analyzed as single longitudinal time series. However, the intrinsic biodiversity within ecosystems leads to spatial gradients with varying ecosystem services. In this workshop, we present our prototype of a spatio-temporal forecasting challenge. This project represents a novel direction for the EFI-RCN and the field of ecological forecasting as a whole, by moving from single-site temporal forecast models to the consideration of entire eco-regions in a spatio-temporal setting.
+Initiative Research Coordination Network ([EFI
+RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are
+the first to set up a system to continually compile and score community
+generated forecasts for true out of sample data prior to data
+collection. *Some additional comments about the temporal challenge
+here*. Questions about ecosystems and ecosystem services are inherently
+focused on the future because they involve understanding how natural
+systems will respond to changing environmental, social, and economic
+conditions over time. Commonly ecosystems are analyzed as single
+longitudinal time series. However, the intrinsic biodiversity within
+ecosystems leads to spatial gradients with varying ecosystem services.
+In this workshop, we present our prototype of a spatio-temporal
+forecasting challenge. This project represents a novel direction for the
+EFI-RCN and the field of ecological forecasting as a whole, by moving
+from single-site temporal forecast models to the consideration of entire
+eco-regions in a spatio-temporal setting.
 
-_The Challenge asks the scientific community to produce ecological forecasts of future observations of ecological data that will be collected and published by the [National Ecological Observatory Network (NEON)](https://www.neonscience.org/). The Challenge is split into [five themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites) that span aquatic and terrestrial systems, and population, community, and ecosystem processes across a broad range of ecoregions. We are excited to use this Challenge to learn more about the predictability of ecological processes by forecasting NEON data before it is collected._
+*The Challenge asks the scientific community to produce ecological
+forecasts of future observations of ecological data that will be
+collected and published by the [National Ecological Observatory Network
+(NEON)](https://www.neonscience.org/). The Challenge is split into [five
+themes](https://projects.ecoforecast.org/neon4cast-ci/targets.html#sec-starting-sites)
+that span aquatic and terrestrial systems, and population, community,
+and ecosystem processes across a broad range of ecoregions. We are
+excited to use this Challenge to learn more about the predictability of
+ecological processes by forecasting NEON data before it is collected.*
 
-While we believe that it is crucial to incorporate spatial components into existing temporal forecasting models, there are challenges to address including the evaluation of spatially misaligned forecasts, increased model complexity and computation time, and the need to archive metadata for spatio-temporal ensemble forecasts. There are also natural research questions that scaffold from all of the previous research done in the context of the EFI-NEON forecasting challenge: are the same modeling frameworks that we deemed successful in this forecasting challenge well-suited to the addition of a spatial component? Are these models still successful but difficult to scale, computationally? Does the additional of granular spatial covariates help us to improve predictive performance of the model over it's temporal counterpart? All of these questions are wide open but we need **you**, the Ecological Forecasting community, to help! 
+While we believe that it is crucial to incorporate spatial components
+into existing temporal forecasting models, there are challenges to
+address including the evaluation of spatially misaligned forecasts,
+increased model complexity and computation time, and the need to archive
+metadata for spatio-temporal ensemble forecasts. There are also natural
+research questions that scaffold from all of the previous research done
+in the context of the EFI-NEON forecasting challenge: are the same
+modeling frameworks that we deemed successful in this forecasting
+challenge well-suited to the addition of a spatial component? Are these
+models still successful but difficult to scale, computationally? Does
+the additional of granular spatial covariates help us to improve
+predictive performance of the model over it's temporal counterpart? All
+of these questions are wide open but we need **you**, the Ecological
+Forecasting community, to help!
 
-_The Challenge is open to any individual or team from anywhere around the world that wants to submit forecasts. Learn more about how you can participate [here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html)._
+*The Challenge is open to any individual or team from anywhere around
+the world that wants to submit forecasts. Learn more about how you can
+participate
+[here.](https://projects.ecoforecast.org/neon4cast-ci/instructions.html).*
 
 ## 2.2 Goals for forecasts of post fire recovery
 
-Ecologist are interested in tracking how landscapes and ecosystems **recover 
-from disturbances such as fire** (changes in leaf area index (LAI)). The timing and pace of 
-recovery can depend on many factors such as fire severity, ecosystem type, weather,
-species present in the location, and species present around the location. For this 
-challenge we are forecasting MODIS LAI averaged across the month to account for
-cloud cover and other factors. The MODIS LAI product is 500 m spatial resolution
-and as such LAI values for each pixel are the combination of the combined 
-foliage of all individuals and species in that 500 m pixel. Each fire
-that is being forecast has multiple pixels that need to be forecast, so there are 
-multiple scores for each fire for each time step.
+Ecologist are interested in tracking how landscapes and ecosystems
+**recover from disturbances such as fire** (changes in leaf area index
+(LAI)). The timing and pace of recovery can depend on many factors such
+as fire severity, ecosystem type, weather, species present in the
+location, and species present around the location. For this challenge we
+are forecasting MODIS LAI averaged across the month to account for cloud
+cover and other factors. The MODIS LAI product is 500 m spatial
+resolution and as such LAI values for each pixel are the combination of
+the combined foliage of all individuals and species in that 500 m pixel.
+Each fire that is being forecast has multiple pixels that need to be
+forecast, so there are multiple scores for each fire for each time step.
 
+The speed and trajectory of post fire recovery varies for many reasons
+and it is important to understand the drivers of post fire recovery in
+LAI. By knowing how different ecosystem recovery post-fire over time we
+can forecast recovery in LAI for different ecosystems post fire. These
+forecasts could be used to help determine management of various
+ecosystems under future climates.
 
-The speed and trajectory of post fire recovery varies for many reasons and it is 
-important to understand the drivers of post fire recovery in LAI. By knowing how
-different ecosystem recovery post-fire over time we can forecast recovery in 
-LAI for different ecosystems post fire. These forecasts could be used to help 
-determine management of various ecosystems under future climates.
+There are many open questions that this challenge could help us
+address: - What models perform the best for predicting LAI recovery post
+fire? and do they change by ecosystem type? - What are the key drivers
+for post fire recovery and do they change across ecosystem types or fire
+severity? - Are areas within each fire more predictable than others? If
+so why?
 
-There are many open questions that this challenge could help us address:
-- What models perform the best for predicting LAI recovery post fire? and do they change by ecosystem type?
-- What are the key drivers for post fire recovery and do they change across ecosystem types or fire severity?
-- Are areas within each fire more predictable than others? If so why?
-
-There are many more open questions and we will have a survey at the end to gather 
-the ones that everyone is interested in and to help us guide the challenge.
+There are many more open questions and we will have a survey at the end
+to gather the ones that everyone is interested in and to help us guide
+the challenge.
 
 ## 2.3 Overview of the [MODIS LAI Post Fire Recovery](https://projects.ecoforecast.org/neon4cast-docs/) theme
 
-**What**: Forecast Leaf Area Index (LAI) recovery post fire based on MODIS LAI. 
-More information on the MODIS LAI data product (MOD15A2H.061: Terra Leaf Area Index/FPAR 8-Day Global 500m)
-we are forecasting can be found
-[here](https://lpdaac.usgs.gov/products/myd15a2hv061/) or [here](https://planetarycomputer.microsoft.com/dataset/modis-15A2H-061#overview). 
-Note: We are not downloading the target datasets from the Planetary computer but 
-are downloading a version that has had images with cloud cover greater than 10%
-removed and then the MODIS LAI values averaged for the each month instead of the
-8 days of the MODIS LAI product.
+**What**: Forecast Leaf Area Index (LAI) recovery post fire based on
+MODIS LAI. More information on the MODIS LAI data product (MOD15A2H.061:
+Terra Leaf Area Index/FPAR 8-Day Global 500m) we are forecasting can be
+found [here](https://lpdaac.usgs.gov/products/myd15a2hv061/) or
+[here](https://planetarycomputer.microsoft.com/dataset/modis-15A2H-061#overview).
+Note: We are not downloading the target datasets from the Planetary
+computer but are downloading a version that has had images with cloud
+cover greater than 10% removed and then the MODIS LAI values averaged
+for the each month instead of the 8 days of the MODIS LAI product.
 
 -   `LAI`: Leaf Area Index in each cell within the fire bounding box.
 
+**Where**: 1 Fire selected from the [Fire
+Database](https://www.mtbs.gov/). The august complex fire is the one we
+are focusing on for this workshop.
 
-**Where**: 1 Fire selected from the [Fire Database](https://www.neonscience.org/field-sites/explore-field-sites). The august
-complex fire is the one we are focusing on for this workshop.
-
-**When**: Target data are available as early as 2010 across our selected fires 
-for monthly averages in LAI for each cell for each fire. Forecasts are accepted
-up to 3 months ahead on a monthly time step.w
+**When**: Target data are available as early as 2010 across our selected
+fires for monthly averages in LAI for each cell for each fire. Forecasts
+are accepted up to 3 months ahead on a monthly time step.w
 
 # 3 Forecasting MODIS LAI Recovery Post Fire
 
 ## 3.1 Define spatial and temporal parameters for our forecast
 
+Before we can forecast fire recovery, we first need to define the fires
+of interest and their spatial extents. We have initially selected a
+handful of fires that span ecosystem types, occurred in close proximity
+to NEON sites to provide additional data sources for modeling efforts,
+occurred relatively recently, and were relatively large fires as the
+MODIS LAI data is being used currently at a relatively course
+resolution. We currently have shape files defined for 5 fires with 3
+occurring in close proximity to NEON sites, the fire names in the
+spatial forecast system are:
+
+-   august_complex = California August Complex fire started in August
+    2020 and burned a total of 1,032,648 acres (417,898 ha) in NW
+    California.
+-   east_troublesome = Colorado East Troublesome fire burned 193,812
+    acres in October and November 2020.
+-   sawmill = The Sawmill Fire that burned 46,991 acres (190 km\^2) in
+    the U.S. state of Arizona in April 2017 and was close in proximity
+    Santa Rita Experimental Range ([NEON
+    SRER](https://www.neonscience.org/field-sites/srer))
+-   creek = Soaproot Saddle ([NEON
+    SOAP](https://www.neonscience.org/field-sites/soap))
+-   chimney_tops = The Chimney Tops 2 fire occured in November 2016 in
+    and around Great Smoky Mountain National Park ([NEON
+    GRSM](https://www.neonscience.org/field-sites/grsm))
+
+The target areas for these fires are available in the `/shp` directory
+in Github repository. The `fire_box` function is available to grab the
+target area for each fire. The `pad_box` argument will pad a 0.5 degrees
+on each side on each side of the bounding box as defined by the fire
+mask shapefiles. Below is an example for the `august_complex` fire.
+
+```{r}
+fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
+```
 
 ## 3.2 Read in the data
 
-To read and write to the forecast cloud, we use functions with the prefix "spat4cast_". We can use `spat4cast_get_data()` to read in a RasterCube object with the provided time series of LAI measurements, and `spat4cast_get_target()` to read in a target for our forecast. 
+To read and write to the forecast cloud, we use functions with the
+prefix "spat4cast\_". We can use `spat4cast_get_data()` to read in a
+RasterCube object with the provided time series of LAI measurements, and
+`spat4cast_get_target()` to read in a target for our forecast.
 
 ```{r}
 raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
@@ -204,9 +291,13 @@ target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
 
 ```
 
-
-
 ## 3.3 Visualise the target data
+
+The target data are stored in MInIO bucket. MinIO is high-performance
+software-defined S3 compatible object storage. The target files are
+generated on a monthly basis via github actions using
+`targets/spatial_targets.R` workflow. The files can be downloaded with
+the `spat4cast_get_targets` function.
 
 ```{r}
 tg <- rast(target_dir)
@@ -215,30 +306,57 @@ plot(tg)
 
 ## 3.4 Create the training dataset
 
-
-
 ## 3.5 Example forecasts: some simple models
 
-The main branch currently has two baseline models implemented. These models are intended to provide a benchmark for evaluating the performance of more complex models. The two baseline models that are currently implemented are:
+The main branch currently has two baseline models implemented. These
+models are intended to provide a benchmark for evaluating the
+performance of more complex models. The two baseline models that are
+currently implemented are:
 
-- A spatial climatology ensemble model
-- A grid ARIMA parametric model
+-   A spatial climatology ensemble model
+-   A grid ARIMA parametric model
 
-We also have two baseline models in the development and debugging stage:
-- A spatio-temporal ICAR random walk
-- A spatio-temporal Gaussian Process 
+We also have two baseline models in the development and debugging
+stage: - A spatio-temporal ICAR random walk - A spatio-temporal Gaussian
+Process
 
-For now, the first two models that we have implemented will provide reasonable competitors to the models developed by challenge participants, and in the context of this workshop will provide a nice demonstration of the difference between parametric and ensemble models and how they are scored.
+For now, the first two models that we have implemented will provide
+reasonable competitors to the models developed by challenge
+participants, and in the context of this workshop will provide a nice
+demonstration of the difference between parametric and ensemble models
+and how they are scored.
 
 ### 3.5.1 Forecast MODIS LAI post fire: Local Climatology Model
 
-The first baseline model is a *local climatology* model. Not to be confused with a climate model (which many participants may be familiar with), the purpose of a climatology model is to use historical data to build a forecast distribution.
+The first baseline model is a *local climatology* model. Not to be
+confused with a climate model (which many participants may be familiar
+with), the purpose of a climatology model is to use historical data to
+build a forecast distribution.
 
-The *local* part of the climatology model comes into play when we consider exactly what historical data is used to create the forecast distribution. As an example, suppose that we have ten years of daily temperature data for the entire state of Virginia. If our end goal is to create a forecast distribution for the temperature in Blacksburg, we may only want to consider the historical data from Montgomery County instead of the entire state. Indeed, the term *local* refers to the fact that we are only considering points that are, in some broad sense, close to our target in space or time.
+The *local* part of the climatology model comes into play when we
+consider exactly what historical data is used to create the forecast
+distribution. As an example, suppose that we have ten years of daily
+temperature data for the entire state of Virginia. If our end goal is to
+create a forecast distribution for the temperature in Blacksburg, we may
+only want to consider the historical data from Montgomery County instead
+of the entire state. Indeed, the term *local* refers to the fact that we
+are only considering points that are, in some broad sense, close to our
+target in space or time.
 
-In the context of generating baseline forecasts for post-fire LAI recovery, we have data from MODIS dating back to 2002 that comes in roughly every 8 days. Rather than using the entire dataset, we consider only LAI measurements that occur in the month of interest. This gives us a snapshot of historical data within a given month so that we can build an informed forecast distribution for how we would expect our process to behave. For example, if we are interested in forecasting the LAI at the Soaproot Saddle NEON site for May 2025, the local climatology model will include LAI measurements from May 2002, May 2003, etc all the way until May 2024.
+In the context of generating baseline forecasts for post-fire LAI
+recovery, we have data from MODIS dating back to 2002 that comes in
+roughly every 8 days. Rather than using the entire dataset, we consider
+only LAI measurements that occur in the month of interest. This gives us
+a snapshot of historical data within a given month so that we can build
+an informed forecast distribution for how we would expect our process to
+behave. For example, if we are interested in forecasting the LAI at the
+Soaproot Saddle NEON site for May 2025, the local climatology model will
+include LAI measurements from May 2002, May 2003, etc all the way until
+May 2024.
 
-A natural follow-up question: once we have identified the data, we want a baseline model. So what exactly is the statistical model that we are using here?
+A natural follow-up question: once we have identified the data, we want
+a baseline model. So what exactly is the statistical model that we are
+using here?
 
 ```{r, echo = FALSE}
 set.seed(05192025)
@@ -247,17 +365,42 @@ hist(dat, breaks = 200, ylim = c(0, 2),
      main = 'Histogram of 20 Data Points')
 ```
 
-In fact these singleton data points *are* our statistical model, at least after a little bit of work. We put some little densities around them (sometimes called "kernel dressing" in the literature) and these little densities come together to turn these singleton points into a forecast distribution. Taking our example from above, this process yields the following:
+In fact these singleton data points *are* our statistical model, at
+least after a little bit of work. We put some little densities around
+them (sometimes called "kernel dressing" in the literature) and these
+little densities come together to turn these singleton points into a
+forecast distribution. Taking our example from above, this process
+yields the following:
 
 ```{r}
 plot(density(dat))
 ```
 
-By choosing to "fit" a non-parametric model to our data we get some additional flexibility, since we don't have to conform to some particular pre-specified probability distribution. For example, if we were to just take a mean and standard deviation of the above data and treat it as a univariate Normal distribution we would be missing out on the fact that our data is actually bimodal with two areas of high density.
+By choosing to "fit" a non-parametric model to our data we get some
+additional flexibility, since we don't have to conform to some
+particular pre-specified probability distribution. For example, if we
+were to just take a mean and standard deviation of the above data and
+treat it as a univariate Normal distribution we would be missing out on
+the fact that our data is actually bimodal with two areas of high
+density.
 
-In many situations, the climatology or local climatology models perform surprisingly well. To paraphrase Benjamin Franklin: "death, taxes, and losing to the climatology". Post fire LAI recovery presents an interesting challenge for historical climatology data however: sites that not previously had a fire during the MODIS period from 2002 to present may not adequately capture the behavior of LAI during post fire-recovery. 
+In many situations, the climatology or local climatology models perform
+surprisingly well. To paraphrase Benjamin Franklin: "death, taxes, and
+losing to the climatology". Post fire LAI recovery presents an
+interesting challenge for historical climatology data however: sites
+that not previously had a fire during the MODIS period from 2002 to
+present may not adequately capture the behavior of LAI during post
+fire-recovery.
 
-Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
+Now, for the interesting part, a demonstration of how to fit the
+climatology model! The function `spat_climatology()` builds a
+climatology forecast using historical data for a given month, and stores
+an ensemble of `geotiff` files. In the event that there are missing
+historical data for a given month, missing values are imputed using a
+simple bootstrap re-sample of previous values within a pixel (using the
+internal `na_bootstrap()` function). For cyberinfrastructure pipeline
+purposes, `spat_climatology` returns the directory that ensemble
+forecasts were written to.
 
 ```{r}
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
@@ -289,17 +432,36 @@ ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
 
-The Grid ARIMA baseline model takes each grid cell in the fire polygon and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA) model. This is a classical technique from time series analysis that combines differencing with autoregressive and moving average models.
+The Grid ARIMA baseline model takes each grid cell in the fire polygon
+and fits a Seasonal Autoregressive Integrated Moving Average (SARIMA)
+model. This is a classical technique from time series analysis that
+combines differencing with autoregressive and moving average models.
 
-If we are in the business of providing technical definitions: a time series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D, Q)$_s$** process if it can be written in the form:
-\begin{align*}
+If we are in the business of providing technical definitions: a time
+series $x = \{x_1, ..., x_T \}$ follows a **SARIMA(p, d, q)(P, D,
+Q)**$_s$ process if it can be written in the form: \begin{align*}
 \phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
-\end{align*}
-For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
+\end{align*} For our purposes, though, we just need to think of the
+SARIMA model as a flexible time series technique that lets us capture
+the temporal autocorrelation, seasonal effects, and correlated errors
+within a grid cell in a statistically cohesive manner.
 
-There are a number of quantities that require estimation within each grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ as well as estimates of their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
+There are a number of quantities that require estimation within each
+grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$
+as well as estimates of their associated parameters
+$\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed
+using the `auto.arima()` function in the `forecast` library. We do this
+by taking the time series of LAI data within a particular grid cell, log
+transforming it, and letting `auto.arima()` pick the best model. We then
+generate forecasts for the next time point(s) using `S3` method for the
+`forecast` function and extract the mean and standard deviation.
 
-We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to for pipeline purposes. 
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()`
+function. `spat_arima_grid` takes a rastercube object as input and fits
+a SARIMA model using `auto.arima` to each grid cell. Grid cells with
+less than 25 available data points are not considered. As with
+`spat_climatology`, the `spat_arima_grid` function returns the directory
+that forecasts were written to for pipeline purposes.
 
 ```{r, eval = T}
 raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
@@ -325,9 +487,13 @@ parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
                                           target  = target_dir)
 ```
 
-It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
-
-
+It is likely that grid cells that are close to each other exhibit
+spatial autocorrelation, and thus it is foolish to throw away that
+valuable information by treating each grid cell as independent. However,
+this model is meant to be a simple baseline comparator that demonstrates
+how parametric forecasts are scored. Baseline models that are currently
+in development seek to account for this spatial and temporal
+autocorrelation in a statistically rigorous manner.
 
 Does this forecast seem reasonable?
 
@@ -344,62 +510,96 @@ parametric_forecast_dir1 |>
   spat4cast_submit(model_id = 'johnsmith')
 ```
 
-
 # 4 Evaluating your forecast
 
 ## 4.1 How your submission will be scored
 
-Submissions are scored using two different proper scoring rules (Gneiting and Raftery, 2007): the Continuous Ranked Probability Score (CRPS; Matheson and Winkler, 1976) and the Logarithmic Score (LogS; Good, 1952). These scores are defined as follows: given a probability density function $f(\cdot)$ and corresponding cumulative distribution function $F(\cdot)$ for our forecast, and an observation $y$, the IGN and CRPS may be written:
-\begin{align}
+Submissions are scored using two different proper scoring rules
+(Gneiting and Raftery, 2007): the Continuous Ranked Probability Score
+(CRPS; Matheson and Winkler, 1976) and the Logarithmic Score (LogS;
+Good, 1952). These scores are defined as follows: given a probability
+density function $f(\cdot)$ and corresponding cumulative distribution
+function $F(\cdot)$ for our forecast, and an observation $y$, the IGN
+and CRPS may be written: \begin{align}
 \text{LogS}(y) &= -\log(f(y));  \\
 \text{CRPS}(y) &= \int_{\mathbb{R}} (F(z) - \mathbf{I}_{z \geq y} )^2 dz 
-\end{align}
-The LogS and CRPS are computed for each grid cell in the target. The individual values for each grid cell are saved, and are useful for visualizing particular areas where the forecast model is performing well or poorly. The final value reported for the challenge is simply the mean value of the respective scores across all grid cells. 
+\end{align} The LogS and CRPS are computed for each grid cell in the
+target. The individual values for each grid cell are saved, and are
+useful for visualizing particular areas where the forecast model is
+performing well or poorly. The final value reported for the challenge is
+simply the mean value of the respective scores across all grid cells.
 
-There are two broad categories of "types" of forecasts that can be submitted for scoring, and our examples so far have been demonstrative of the differences. 
+There are two broad categories of "types" of forecasts that can be
+submitted for scoring, and our examples so far have been demonstrative
+of the differences.
 
-- _Ensemble forecasts_ 
-- _Parametric forecasts_
+-   *Ensemble forecasts*
+-   *Parametric forecasts*
 
-These forecasts are handled slightly differently in terms of how they are scored. Unsurprisingly, ensemble forecast submissions are scored using the `scoring_spat_ensemble` function and parametric forecasts are scored using the `scoring_spat_parametric` function. We will walk through how these two types of forecasts differ, how they are distinguished from one another during submission, and how they are scored.
+These forecasts are handled slightly differently in terms of how they
+are scored. Unsurprisingly, ensemble forecast submissions are scored
+using the `scoring_spat_ensemble` function and parametric forecasts are
+scored using the `scoring_spat_parametric` function. We will walk
+through how these two types of forecasts differ, how they are
+distinguished from one another during submission, and how they are
+scored.
 
-Parametric forecasts search the name of the submission raster for any of the following words:
-- Lognormal
-- Normal
-- Bernoulli
-- Beta
-- Uniform
-- Gamma
-- Logistic
-- Exponential
-- Poisson
-If any of these words are present in the file naming convention for a particular forecast, the scoring pipeline will pull these files out and use the named probability distribution to analytically compute values for the CRPS and LogS. 
+Parametric forecasts search the name of the submission raster for any of
+the following words: - Lognormal - Normal - Bernoulli - Beta - Uniform -
+Gamma - Logistic - Exponential - Poisson If any of these words are
+present in the file naming convention for a particular forecast, the
+scoring pipeline will pull these files out and use the named probability
+distribution to analytically compute values for the CRPS and LogS.
 
-**Ensemble forecasts**, like the local climatology baseline model from Section 3.5.1, provide numerous different individual forecasts. These "different" forecasts could all be output from various models, the same model under different parameter settings, or the same model with the same parameters but with some instrinsic randomness or stochasticity. The way that these . The way that these ensemble members are handled during scoring is fundamentally different than how parametric forecasts are handled. Submitting an ensemble forecast as a user is actually quite easy: create a collection of GeoTiff files, store them in a directory, and use the `spat4cast_submit` function like we did in Section 3.6. Since each individual ensemble member may be from a different forecast model, we cannot assume that the collection of ensembles comes from some underlying parametric distribution. Instead the ensemble output from each grid cell at each time is used to create probability density function, much like the example from Section 3.5.1! We then use this collection of probability density functions to assign CRPS and LogS scores using the `scoringRules` package under the hood.
+**Ensemble forecasts**, like the local climatology baseline model from
+Section 3.5.1, provide numerous different individual forecasts. These
+"different" forecasts could all be output from various models, the same
+model under different parameter settings, or the same model with the
+same parameters but with some instrinsic randomness or stochasticity.
+The way that these . The way that these ensemble members are handled
+during scoring is fundamentally different than how parametric forecasts
+are handled. Submitting an ensemble forecast as a user is actually quite
+easy: create a collection of GeoTiff files, store them in a directory,
+and use the `spat4cast_submit` function like we did in Section 3.6.
+Since each individual ensemble member may be from a different forecast
+model, we cannot assume that the collection of ensembles comes from some
+underlying parametric distribution. Instead the ensemble output from
+each grid cell at each time is used to create probability density
+function, much like the example from Section 3.5.1! We then use this
+collection of probability density functions to assign CRPS and LogS
+scores using the `scoringRules` package under the hood.
 
 Parametric Scoring section.
-
 
 ## 4.2 How to score your own forecast
 
 -   Which model(s) did best?
 -   What might explain the differences in scores between the different
     models?
-    
+
 ## 4.3 Improving your forecasts: Incorporating additional data
 
-An obvious choice for improving on the baseline models presented here is to incorporate covariate information into our forecasts of LAI. Three of our focal fires occurred at NEON sites. This means that we have access to a wealth of covariate information, if we are able to access it and process it! In this section, we provide example code that uses the `neonstore` package to pull and aggregate NEON data for:
+An obvious choice for improving on the baseline models presented here is
+to incorporate covariate information into our forecasts of LAI. Three of
+our focal fires occurred at NEON sites. This means that we have access
+to a wealth of covariate information, if we are able to access it and
+process it! In this section, we provide example code that uses the
+`neonstore` package to pull and aggregate NEON data for:
 
-- Temperature (daily minimum and maximum temperature)
-- Incoming shortwave radiation (daily)
-- Relative humidity (daily)
+-   Temperature (daily minimum and maximum temperature)
+-   Incoming shortwave radiation (daily)
+-   Relative humidity (daily)
 
-In order to avoid any potential package and dependecy related issues with the installation of `neonstore`, we provide all of the example data from this section in a `.csv` file format on the bucket, so that participants can immediately jump into model building. This process can be roughly broken down into four steps:
+In order to avoid any potential package and dependecy related issues
+with the installation of `neonstore`, we provide all of the example data
+from this section in a `.csv` file format on the bucket, so that
+participants can immediately jump into model building. This process can
+be roughly broken down into four steps:
 
-- Identifying your site of interest
-- Finding and accessing a data product for your covariate of interest
-- Aggregating data to the desired time scale
-- (Optional) Imputing missing data
+-   Identifying your site of interest
+-   Finding and accessing a data product for your covariate of interest
+-   Aggregating data to the desired time scale
+-   (Optional) Imputing missing data
 
 ```{r, eval = FALSE}
 ## set site to desired NEON site
@@ -408,14 +608,24 @@ In order to avoid any potential package and dependecy related issues with the in
 site <- 'SOAP'
 ```
 
-The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON's wonderful data portal (found [here]: (https://data.neonscience.org/)) it is not difficult at all. Searching "air temperature" in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (`DP1.00003.001`).
+The second step is to find a data product that contains your covariate
+of interest. While these seems like it may be a daunting task, thanks to
+NEON's wonderful data portal (found \[here\]:
+(https://data.neonscience.org/)) it is not difficult at all. Searching
+"air temperature" in the data portal search bar gives us multiple
+options: we will go with Triple Aspirated Air Temperature
+(`DP1.00003.001`).
 
 ```{r, eval = F}
 ## air temp data product
 air_temp_dp <- 'DP1.00003.001'
 ```
 
-Once we have identified our site and data product of interest, we can use the `neon_download` function from the `neonstore` package to pull the data. For further reading on `neonstore`, Claire K. Lunch has an excellent tutorial that can be found [here](https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial).
+Once we have identified our site and data product of interest, we can
+use the `neon_download` function from the `neonstore` package to pull
+the data. For further reading on `neonstore`, Claire K. Lunch has an
+excellent tutorial that can be found
+[here](https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial).
 
 ```{r, eval = F}
 ## use neonstore package "neon_download" function to pull data product
@@ -423,7 +633,10 @@ Once we have identified our site and data product of interest, we can use the `n
 neon_download(product = air_temp_dp, site = site)
 ```
 
-With our data product of interest downloaded, we can now focus on aggregation to our desired timescale. Triple aspirated air temperature is available as one and thirty minute averages, and here we demonstrate how to aggregate to daily minimum and maximum temperature.
+With our data product of interest downloaded, we can now focus on
+aggregation to our desired timescale. Triple aspirated air temperature
+is available as one and thirty minute averages, and here we demonstrate
+how to aggregate to daily minimum and maximum temperature.
 
 ```{r, eval = FALSE}
 ## read the 30 minute measurements into temp_table
@@ -451,7 +664,12 @@ temp_info <- temp_table %>%
               replace(., is.infinite(.), NA))
 ```
 
-The optional fourth step is imputation of missing data. In this example, we provide code for data imputation using a Kalman filter. We do note that data imputation can be done in many different ways, and thus in the example covariate data provided we include columns with both aggregated imputed data and aggregated raw data for any user who would like to employ their own imputation strategies.
+The optional fourth step is imputation of missing data. In this example,
+we provide code for data imputation using a Kalman filter. We do note
+that data imputation can be done in many different ways, and thus in the
+example covariate data provided we include columns with both aggregated
+imputed data and aggregated raw data for any user who would like to
+employ their own imputation strategies.
 
 ```{r, eval = FALSE}
 library(imputeTS) ## for na_kalman
@@ -461,7 +679,8 @@ temp_info$MinTInterp <- na_kalman(temp_info$MinT_daily)
 temp_info$MaxTInterp <- na_kalman(temp_info$MaxT_daily)
 ```
 
-Though we won't go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:
+Though we won't go through them in detail, additional code for pulling
+and aggregating shortwave radiation and relative humidity data is below:
 
 ```{r, eval = FALSE}
 ## set data product for shortwave radiation (primary pyranometer)
@@ -502,6 +721,28 @@ rh_info <- rh_table %>%
 rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 ```
 
+##Burn Severity Data
+
+One sources of information about the fire are burn severity metrics, The
+USGS maintains a [Burn Severity
+Portal](https://burnseverity.cr.usgs.gov/products) with great
+documentation outlining available data products. This soil burn severity
+dataset was derived from Sentinel 2 data and field validated by a Forest
+Service Burned Area Emergency Response (BAER) team. It is based upon an
+initial Burned Area Reflectance Classification (BARC) dataset created by
+analyzing satellite imagery. A pre-fire and post-fire Sentinel 2 scene
+were processed to develop a differenced Normalized Burn Ratio (dNBR)
+image. The dNBR image attempts to portray the variation of burn severity
+within a fire and captures the combined effects of the fire to
+vegetation and soil components of the ecosytem. The preliminary BARC
+dataset was assessed by a Forest Service BAER team and modified, if
+necessary, based on field conditions. These data were created by the
+USDA Forest Service Geospatial Technology and Applications Center (GTAC)
+to support Burned Area Emergency Response (BAER) teams.
+
+We have uploaded burn severity maps to the `spat4cast_data` bucket.
+These data can be gathered by using the `spat4cast_get_data()`function.
+
 # 5 What’s next?
 
 -   The forecasts we created here were relatively simple. What are ideas
@@ -513,4 +754,8 @@ rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 
 # 6 Acknowledgements
 
-We would like to thank everyone who has joined the EFI Cyberinfrastructure calls during the last two years to provide feedback and discuss progress on this project. A special thank you to Carl Boettiger and Quinn Thomas for all of their assistance, from the onset of this project during the 2023 EFI Unconference to present.
+We would like to thank everyone who has joined the EFI
+Cyberinfrastructure calls during the last two years to provide feedback
+and discuss progress on this project. A special thank you to Carl
+Boettiger and Quinn Thomas for all of their assistance, from the onset
+of this project during the 2023 EFI Unconference to present.

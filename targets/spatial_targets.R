@@ -5,6 +5,7 @@ library(lubridate)
 library(gdalcubes)
 library(rstac)
 library(stars)
+library(assertthat)
 
 #Source functions
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
@@ -14,7 +15,12 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 fire <- "sawmill"
 
 dir = "targets"
-site_id = fire
+set_Site <- list.dirs("./shp", full.names = F,recursive = F)
+#site_id = set_Site[3]
+
+#Loop around the sites for creating targets
+for(site_id in set_Site){
+
 dt = "P1M"
 dx = 0.1
 dy = 0.1
@@ -54,6 +60,6 @@ target <- create_target_file(cuberast = raster_cube,
                              bucket = NULL,
                              mask = fire_box$maskLayer,
                              dt = dt,
-                             var = "LAI_modis")
+                             var = "lai_recovery")
 
-                             
+}                           
