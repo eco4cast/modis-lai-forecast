@@ -300,7 +300,6 @@ For some modelling approaches, a gdalcubes "RasterCube" format may be appropriat
 data_matrix <- gdalcube_to_matrix2(raster_cube, threshold = 12 )
 ```
 
-
 ## 3.5 Example forecasts: some simple models
 
 The main branch currently has two baseline models implemented. These
