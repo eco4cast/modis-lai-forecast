@@ -27,7 +27,12 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
                                   dy = 0.1, 
                                   dt = "P30D",
                                   aggregation = "mean",
-                                  resampling = "near"){
+                                  resampling = "near",
+                                  variable =c("lai_recovery","burn_severity")[1]
+                                  ){
+  
+  
+  if(variable == "lai_recovery"){
   
   # Get Bounding box for fire
   fire_box <- fire_bbox(fire = fire, pad_box = TRUE, dir = dir)
@@ -43,7 +48,7 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
   dir.create("files")
   
   # Copy files from miniobucket
-  mc_cp(paste0("efi/spat4cast-data/duration=P1M/variable=lai_recovery/site_id=",fire,"/"), "files", recursive = TRUE)
+  mc_cp(paste0("efi/spat4cast-data/duration=P1M/variable=",variable,"/site_id=",fire,"/"), "files", recursive = TRUE)
   
   # extract dates from copied files
   d <-str_extract(dir_ls("files/"), "(?<=/Lai_500m_).*(?=\\.)")
@@ -62,4 +67,23 @@ spat4cast_get_data <- function(start_date = "2002-01-01",
   # create proxy data cube
   proxy_cube <- gdalcubes::raster_cube(cube, v)
   return(proxy_cube)
+  }
+  else if (variable == "burn_severity"){
+    # set mc_alias
+    minioclient::mc_alias_set("efi", "data.ecoforecast.org", "", "")
+    
+    # create temporary directory to hold files
+    dir.create("files")
+    
+    # Copy files from miniobucket
+    minioclient::mc_cp(paste0("efi/spat4cast-data/duration=P1M/variable=",variable,"/site_id=",fire,"/"), "files", recursive = TRUE)
+    
+    fileSbs <-list.files("files", pattern = "SBS", full.names = T)
+    
+    rastSbs <- terra::rast(fileSbs)
+    
+    return(rastSbs)
+    
+  }
+  
 }

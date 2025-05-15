@@ -285,7 +285,8 @@ raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
                                   dy = 0.1, 
                                   dt = "P30D",
                                   aggregation = "mean",
-                                  resampling = "near")
+                                  resampling = "near",
+                                  variable = "lai_recovery")
 
 target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
 
@@ -721,27 +722,39 @@ rh_info <- rh_table %>%
 rh_info$RelHumInterp <- na_kalman(rh_info$RelHum)
 ```
 
-##Burn Severity Data
+### Burn Severity Data
 
-One sources of information about the fire are burn severity metrics, The
-USGS maintains a [Burn Severity
-Portal](https://burnseverity.cr.usgs.gov/products) with great
-documentation outlining available data products. This soil burn severity
-dataset was derived from Sentinel 2 data and field validated by a Forest
-Service Burned Area Emergency Response (BAER) team. It is based upon an
-initial Burned Area Reflectance Classification (BARC) dataset created by
-analyzing satellite imagery. A pre-fire and post-fire Sentinel 2 scene
-were processed to develop a differenced Normalized Burn Ratio (dNBR)
-image. The dNBR image attempts to portray the variation of burn severity
-within a fire and captures the combined effects of the fire to
-vegetation and soil components of the ecosytem. The preliminary BARC
-dataset was assessed by a Forest Service BAER team and modified, if
-necessary, based on field conditions. These data were created by the
-USDA Forest Service Geospatial Technology and Applications Center (GTAC)
-to support Burned Area Emergency Response (BAER) teams.
+One valuable source of information about wildfire impact is burn
+severity metrics. The USGS maintains a [Burn Severity
+Portal](https://burnseverity.cr.usgs.gov/products), which provides
+comprehensive documentation and access to relevant data products. The
+soil burn severity dataset discussed here was derived from Sentinel-2
+satellite imagery and validated in the field by a U.S. Forest Service
+Burned Area Emergency Response (BAER) team. It is based on an initial
+Burned Area Reflectance Classification (BARC) dataset, which is created
+by analyzing pre- and post-fire Sentinel-2 scenes to generate a
+differenced Normalized Burn Ratio (dNBR) image. This dNBR image
+illustrates the variation in burn severity across a fire-affected area,
+capturing the cumulative effects on both vegetation and soil components
+of the ecosystem. The preliminary BARC dataset is then evaluated by a
+BAER team and adjusted as needed based on field observations. These data
+are produced by the USDA Forest Service’s Geospatial Technology and
+Applications Center (GTAC) to support BAER teams in post-fire assessment
+and response.
+
+![Burn
+Severity](https://burnseverity.cr.usgs.gov/sites/burn_severity/files/2025-02/BAER-Method_20250218.png)
 
 We have uploaded burn severity maps to the `spat4cast_data` bucket.
 These data can be gathered by using the `spat4cast_get_data()`function.
+
+```{r}
+rastSbs <- spat4cast_get_data(fire = "august_complex",
+                                  variable = "burn_severity")
+
+plot(rastSbs)
+
+```
 
 # 5 What’s next?
 

@@ -280,7 +280,8 @@ window.Quarto = {
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">dy =</span> <span class="fl">0.1</span>, </span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">dt =</span> <span class="st">"P30D"</span>,</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">aggregation =</span> <span class="st">"mean"</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">resampling =</span> <span class="st">"near"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">resampling =</span> <span class="st">"near"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">variable =</span> <span class="st">"lai_recovery"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in dir.create("files"): 'files' already exists</code></pre>
 </div>
@@ -553,9 +554,32 @@ window.Quarto = {
 <span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.nan</span>(.), <span class="cn">NA</span>))</span>
 <span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>rh_info<span class="sc">$</span>RelHumInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(rh_info<span class="sc">$</span>RelHum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>##Burn Severity Data</p>
-<p>One sources of information about the fire are burn severity metrics, The USGS maintains a <a href="https://burnseverity.cr.usgs.gov/products">Burn Severity Portal</a> with great documentation outlining available data products. This soil burn severity dataset was derived from Sentinel 2 data and field validated by a Forest Service Burned Area Emergency Response (BAER) team. It is based upon an initial Burned Area Reflectance Classification (BARC) dataset created by analyzing satellite imagery. A pre-fire and post-fire Sentinel 2 scene were processed to develop a differenced Normalized Burn Ratio (dNBR) image. The dNBR image attempts to portray the variation of burn severity within a fire and captures the combined effects of the fire to vegetation and soil components of the ecosytem. The preliminary BARC dataset was assessed by a Forest Service BAER team and modified, if necessary, based on field conditions. These data were created by the USDA Forest Service Geospatial Technology and Applications Center (GTAC) to support Burned Area Emergency Response (BAER) teams.</p>
+<section id="burn-severity-data" class="level3">
+<h3 class="anchored" data-anchor-id="burn-severity-data">Burn Severity Data</h3>
+<p>One valuable source of information about wildfire impact is burn severity metrics. The USGS maintains a <a href="https://burnseverity.cr.usgs.gov/products">Burn Severity Portal</a>, which provides comprehensive documentation and access to relevant data products. The soil burn severity dataset discussed here was derived from Sentinel-2 satellite imagery and validated in the field by a U.S. Forest Service Burned Area Emergency Response (BAER) team. It is based on an initial Burned Area Reflectance Classification (BARC) dataset, which is created by analyzing pre- and post-fire Sentinel-2 scenes to generate a differenced Normalized Burn Ratio (dNBR) image. This dNBR image illustrates the variation in burn severity across a fire-affected area, capturing the cumulative effects on both vegetation and soil components of the ecosystem. The preliminary BARC dataset is then evaluated by a BAER team and adjusted as needed based on field observations. These data are produced by the USDA Forest Service’s Geospatial Technology and Applications Center (GTAC) to support BAER teams in post-fire assessment and response.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://burnseverity.cr.usgs.gov/sites/burn_severity/files/2025-02/BAER-Method_20250218.png" class="img-fluid figure-img"></p>
+<figcaption>Burn Severity</figcaption>
+</figure>
+</div>
 <p>We have uploaded burn severity maps to the <code>spat4cast_data</code> bucket. These data can be gathered by using the <code>spat4cast_get_data()</code>function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rastSbs <span class="ot">&lt;-</span> <span class="fu">spat4cast_get_data</span>(<span class="at">fire =</span> <span class="st">"august_complex"</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">variable =</span> <span class="st">"burn_severity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in dir.create("files"): 'files' already exists</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rastSbs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="efi_2025_workshop_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 </section>
 <section id="whats-next" class="level1">
