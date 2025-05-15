@@ -384,10 +384,10 @@ dir.create(scores_dir, FALSE)
 
 # Save scores into .tifs
 terra::writeRaster(crps_raster, 
-                   filename = paste0(scores_dir, "/crps_scores_parametric.tif"),
+                   filename = paste0(scores_dir, "/crps_scores.tif"),
                    overwrite=TRUE)
 terra::writeRaster(logs_raster, 
-                   filename = paste0(scores_dir, '/logs_scores_parametric.tif'),
+                   filename = paste0(scores_dir, '/logs_scores.tif'),
                    overwrite=TRUE)
 
 

@@ -7,7 +7,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+library(tidyverse)
+suppressPackageStartupMessages(source("../packages.R"))
 ```
+
 # 1 About this tutorial
 
 ## 1.1 Learning objectives
@@ -109,6 +113,7 @@ library(minioclient)
 library(purrr)
 library(remotes)
 library(neon4cast)
+library(minioclient)
 ```
 
 # 2 Introduction
@@ -195,13 +200,36 @@ fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 
 ## 3.2 Read in the data
 
+To read and write to the forecast cloud, we use functions with the prefix "spat4cast_". We can use `spat4cast_get_data()` to read in a RasterCube object with the provided time series of LAI measurements, and `spat4cast_get_target()` to read in a target for our forecast. 
+
+```{r}
+raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
+                                  end_date = "2025-05-01",
+                                  fire = "august_complex",
+                                  collection = "modis-15A2H-061",
+                                  asset_name = "Lai_500m",
+                                  srs = "EPSG:4326",
+                                  dx = 0.1, 
+                                  dy = 0.1, 
+                                  dt = "P30D",
+                                  aggregation = "mean",
+                                  resampling = "near")
+
+target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
+
+```
+
+
 
 
 ## 3.3 Visualise the target data
 
-The target data are stored in MInIO bucket. MinIO is high-performance software-defined S3 compatible object storage. The target files are generated on a monthly basis via github actions using `targets/spatial_targets.R` workflow. The files can be downloaded with the `spat4cast_get_targets` function (??Should this just grab the latest target file or all target files??).
+The target data are stored in MInIO bucket. MinIO is high-performance software-defined S3 compatible object storage. The target files are generated on a monthly basis via github actions using `targets/spatial_targets.R` workflow. The files can be downloaded with the `spat4cast_get_targets` function.
 
-
+```{r}
+tg <- rast(target_dir)
+plot(tg)
+```
 
 ## 3.4 Create the training dataset
 
@@ -216,8 +244,8 @@ The main branch currently has two baseline models implemented. These models are 
 - A grid ARIMA parametric model
 
 We also have two baseline models in the development and debugging stage:
-- A spatial-temporal ICAR random walk
-- A spatial Gaussian Process 
+- A spatio-temporal ICAR random walk
+- A spatio-temporal Gaussian Process 
 
 For now, the first two models that we have implemented will provide reasonable competitors to the models developed by challenge participants, and in the context of this workshop will provide a nice demonstration of the difference between parametric and ensemble models and how they are scored.
 
@@ -250,12 +278,6 @@ In many situations, the climatology or local climatology models perform surprisi
 
 Now, for the interesting part, a demonstration of how to fit the climatology model! The function `spat_climatology()` builds a climatology forecast using historical data for a given month, and stores an ensemble of `geotiff` files. In the event that there are missing historical data for a given month, missing values are imputed using a simple bootstrap re-sample of previous values within a pixel (using the internal `na_bootstrap()` function). For cyberinfrastructure pipeline purposes, `spat_climatology` returns the directory that ensemble forecasts were written to.
 
-```{r, echo = FALSE}
-for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
-library(tidyverse)
-suppressPackageStartupMessages(source("../packages.R"))
-```
-
 ```{r}
 fire_box <- fire_bbox(fire = "august_complex", pad_box = TRUE, dir = '../shp')
 ```
@@ -266,7 +288,7 @@ gdalcubes::gdalcubes_options(parallel=TRUE)
 
 # use ingest_planetary_data function to extract raster cube for fire bounding box between Jan 1 2002 and July 1 2023.
 raster_cube <- ingest_planetary_data(start_date = "2015-01-01", 
-                                     end_date = "2025-03-01", 
+                                     end_date = "2025-03-01",
                                      box = fire_box$bbox,
                                      srs = "EPSG:4326",
                                      dx = 0.1, 
@@ -276,18 +298,12 @@ raster_cube <- ingest_planetary_data(start_date = "2015-01-01",
                                      asset_name = "Lai_500m")
 ```
 
-```{r, include=FALSE}
+```{r}
 # Forecast ----------------------------------------------------------------
 library(minioclient)
 ensemble_forecast_dir <- spat_climatology(cuberast = raster_cube,
                                           date = '2025-03-01',
                                           dir = 'climatology')
-
-install_mc()
-mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
-
-ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsmith')
 ```
 
 ### 3.5.2 Forecast MODIS LAI post fire: gridded ARIMA model
@@ -298,21 +314,34 @@ If we are in the business of providing technical definitions: a time series $x =
 \begin{align*}
 \phi_P (B^s) \Phi_p (B) (1 - B^s)^D (1 - B)^d x_t = \theta_q (B^s) \Theta_q (B) w_t
 \end{align*}
-(do we need this? can I just link to other SARIMA material?). For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
+For our purposes, though, we just need to think of the SARIMA model as a flexible time series technique that lets us capture the temporal autocorrelation, seasonal effects, and correlated errors within a grid cell in a statistically cohesive manner.
 
 There are a number of quantities that require estimation within each grid cell. The actual specification of each $p_{i,j}, q_{i,j}, d_{i,j}$ as well as estimates of their associated parameters $\vec{\theta}_{i,j}, \vec{\phi}_{i,j}, \sigma^2_{i,j}$ are computed using the `auto.arima()` function in the `forecast` library. We do this by taking the time series of LAI data within a particular grid cell, log transforming it, and letting `auto.arima()` pick the best model. We then generate forecasts for the next time point(s) using `S3` method for the `forecast` function and extract the mean and standard deviation. 
 
-We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a matrix as input (we might want to change this to take the target file?) and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to. 
+We fit our grid cell SARIMA baseline model using the `spat_arima_grid()` function. `spat_arima_grid` takes a rastercube object as input and fits a SARIMA model using `auto.arima` to each grid cell. Grid cells with less than 25 available data points are not considered. As with `spat_climatology`, the `spat_arima_grid` function returns the directory that forecasts were written to for pipeline purposes. 
 
-```{r, eval = F}
-target_mat <- read_csv('../nimble_mat.csv')
-parametric_forecast_dir1 <- spat_arima_grid(cuberast = target_mat,
-                                          date = '2025-03-01',
-                                          dir = 'gsarima')
+```{r, eval = T}
+raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
+                                  end_date = "2025-05-01",
+                                  fire = "august_complex",
+                                  collection = "modis-15A2H-061",
+                                  asset_name = "Lai_500m",
+                                  srs = "EPSG:4326",
+                                  dx = 0.1, 
+                                  dy = 0.1, 
+                                  dt = "P30D",
+                                  aggregation = "mean",
+                                  resampling = "near")
 
-parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'johnsmith')
+# dir.create("target")
+# 
+# mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
+# 
+# mc_cp("efi/spat4cast-targets/duration=P1M/variable=lai_recovery/site=august_complex/lai_recovery-target-2025-04-01.tif", "target")
 
+parametric_forecast_dir1 <- spat_arima_grid(cuberast = raster_cube,
+                                          dir = 'gsarima',
+                                          target  = target_dir)
 ```
 
 It is likely that grid cells that are close to each other exhibit spatial autocorrelation, and thus it is foolish to throw away that valuable information by treating each grid cell as independent. However, this model is meant to be a simple baseline comparator that demonstrates how parametric forecasts are scored. Baseline models that are currently in development seek to account for this spatial and temporal autocorrelation in a statistically rigorous manner. 
@@ -323,13 +352,51 @@ Does this forecast seem reasonable?
 
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
+```{r, eval = FALSE}
+install_mc()
+mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
 
+ensemble_forecast_dir |>
+  spat4cast_submit(model_id = 'johnsmith')
+
+parametric_forecast_dir1 |>
+  spat4cast_submit(model_id = 'johnsmith')
+```
 
 
 # 4 Evaluating your forecast
 
 ## 4.1 How your submission will be scored
 
+Submissions are scored using two different proper scoring rules (Gneiting and Raftery, 2007): the Continuous Ranked Probability Score (CRPS; Matheson and Winkler, 1976) and the Logarithmic Score (LogS; Good, 1952). These scores are defined as follows: given a probability density function $f(\cdot)$ and corresponding cumulative distribution function $F(\cdot)$ for our forecast, and an observation $y$, the IGN and CRPS may be written:
+\begin{align}
+\text{LogS}(y) &= -\log(f(y));  \\
+\text{CRPS}(y) &= \int_{\mathbb{R}} (F(z) - \mathbf{I}_{z \geq y} )^2 dz 
+\end{align}
+The LogS and CRPS are computed for each grid cell in the target. The individual values for each grid cell are saved, and are useful for visualizing particular areas where the forecast model is performing well or poorly. The final value reported for the challenge is simply the mean value of the respective scores across all grid cells. 
+
+There are two broad categories of "types" of forecasts that can be submitted for scoring, and our examples so far have been demonstrative of the differences. 
+
+- _Ensemble forecasts_ 
+- _Parametric forecasts_
+
+These forecasts are handled slightly differently in terms of how they are scored. Unsurprisingly, ensemble forecast submissions are scored using the `scoring_spat_ensemble` function and parametric forecasts are scored using the `scoring_spat_parametric` function. We will walk through how these two types of forecasts differ, how they are distinguished from one another during submission, and how they are scored.
+
+Parametric forecasts search the name of the submission raster for any of the following words:
+- Lognormal
+- Normal
+- Bernoulli
+- Beta
+- Uniform
+- Gamma
+- Logistic
+- Exponential
+- Poisson
+If any of these words are present in the file naming convention for a particular forecast, the scoring pipeline will pull these files out and use the named probability distribution to analytically compute values for the CRPS and LogS. 
+
+**Ensemble forecasts**, like the local climatology baseline model from Section 3.5.1, provide numerous different individual forecasts. These "different" forecasts could all be output from various models, the same model under different parameter settings, or the same model with the same parameters but with some instrinsic randomness or stochasticity. The way that these . The way that these ensemble members are handled during scoring is fundamentally different than how parametric forecasts are handled. Submitting an ensemble forecast as a user is actually quite easy: create a collection of GeoTiff files, store them in a directory, and use the `spat4cast_submit` function like we did in Section 3.6. Since each individual ensemble member may be from a different forecast model, we cannot assume that the collection of ensembles comes from some underlying parametric distribution. Instead the ensemble output from each grid cell at each time is used to create probability density function, much like the example from Section 3.5.1! We then use this collection of probability density functions to assign CRPS and LogS scores using the `scoringRules` package under the hood.
+
+Parametric Scoring section.
 
 
 ## 4.2 How to score your own forecast

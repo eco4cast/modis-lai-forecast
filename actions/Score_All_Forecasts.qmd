@@ -9,7 +9,7 @@ editor: visual
 
 ```{r message = FALSE}
 knitr::opts_chunk$set(message=FALSE, warning = FALSE)
-suppressPackageStartupMessages(source("packages.R"))
+suppressPackageStartupMessages(source("../packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 ```
 
@@ -50,9 +50,9 @@ target <- create_target_file(cuberast = raster_cube,
 mc_alias_set("efi", "data.ecoforecast.org",
              Sys.getenv("AWS_ACCESS_KEY_ID"), Sys.getenv("AWS_SECRET_ACCESS_KEY"))
 
-submitted <- mc_ls("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+submitted <- mc_ls("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
 
-scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+scored <- mc_ls("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
 
 submitted <- unique(str_extract(submitted, ".*/reference_date=.*(?=/)"))
 
@@ -62,7 +62,7 @@ subs_to_score <- submitted[which(submitted %in% scored == 0)]
 
 
 if(length(subs_to_score) > 0){
-subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
+subs_to_score <- paste0("efi/spat4cast-submissions/duration=P1M/variable=lai_recovery/site_id=august_complex/",subs_to_score,"/")
   for(i in subs_to_score){
     model_id <- str_extract(i, "(?<=model_id=).*(?=/reference_date=)")
     ref_date <- str_extract(i, "(?<=reference_date=).*(?=/)" )
@@ -87,10 +87,10 @@ subs_to_score <- paste0("efi/spat4cast-submissions/variable=lai_recovery/site_id
 ## Lets Get visualizations of each of the scored forecasts
 
 ```{r}
-scored <- mc_ls("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
+scored <- mc_ls("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", recursive = TRUE)
 
 scored <- unique(str_extract(scored, ".*/reference_date=.*/"))
-scored <- paste0("efi/spat4cast-scores/variable=lai_recovery/site_id=august_complex/", scored)
+scored <- paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=august_complex/", scored)
 for (j in scored){
   model_id <- str_extract(j, "(?<=model_id=).*(?=/reference_date=)")
   ref_date <- str_extract(j, "(?<=reference_date=).*(?=/)" )
@@ -110,11 +110,6 @@ for (j in scored){
   }
 }
 
-
-A <- c("A", "B", "C")
-B <- c("A", "B", "C")
-
-a <- A[which(A %in% B == 0)]
 
 
 

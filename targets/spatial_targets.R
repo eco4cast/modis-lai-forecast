@@ -11,6 +11,9 @@ library(assertthat)
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 # devtools::load_all()
 
+# input target sites
+fire <- "sawmill"
+
 dir = "targets"
 set_Site <- list.dirs("./shp", full.names = F,recursive = F)
 #site_id = set_Site[3]
@@ -58,5 +61,5 @@ target <- create_target_file(cuberast = raster_cube,
                              mask = fire_box$maskLayer,
                              dt = dt,
                              var = "lai_recovery")
-                             
+
 }                           
