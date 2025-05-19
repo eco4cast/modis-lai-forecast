@@ -342,7 +342,7 @@ currently implemented are:
 
 We also have two baseline models in the development and debugging
 stage: - A spatio-temporal ICAR random walk - A spatio-temporal Gaussian
-Process
+Process.
 
 For now, the first two models that we have implemented will provide
 reasonable competitors to the models developed by challenge
@@ -665,8 +665,7 @@ site <- 'SOAP'
 
 The second step is to find a data product that contains your covariate
 of interest. While these seems like it may be a daunting task, thanks to
-NEON's wonderful data portal (found \[here\]:
-(https://data.neonscience.org/)) it is not difficult at all. Searching
+NEON's wonderful data portal (found [here](https://data.neonscience.org/)) it is not difficult at all. Searching
 "air temperature" in the data portal search bar gives us multiple
 options: we will go with Triple Aspirated Air Temperature
 (`DP1.00003.001`).
@@ -821,7 +820,7 @@ plot(rastSbs)
     
 Please take the time to provide feedback on the workshop and what you are interested
 in regarding the post fire recovery challenge as we move towards the official launch
-of the challenge. https://docs.google.com/forms/d/e/1FAIpQLSfZ-NtxKjySj6gTnO-6mdfXCZAzQPZPQYoKiVm6S2-EkJ2iMA/viewform?usp=dialog
+of the challenge. [Spatial Workshop Survey](https://docs.google.com/forms/d/e/1FAIpQLSfZ-NtxKjySj6gTnO-6mdfXCZAzQPZPQYoKiVm6S2-EkJ2iMA/viewform?usp=dialog)
 
 # 6 Acknowledgements
 
