@@ -818,6 +818,10 @@ plot(rastSbs)
     Different forecast horizons?
 -   How could you apply what you have learned here in your research or
     teaching?
+    
+Please take the time to provide feedback on the workshop and what you are interested
+in regarding the post fire recovery challenge as we move towards the official launch
+of the challenge. https://docs.google.com/forms/d/e/1FAIpQLSfZ-NtxKjySj6gTnO-6mdfXCZAzQPZPQYoKiVm6S2-EkJ2iMA/viewform?usp=dialog
 
 # 6 Acknowledgements
 
