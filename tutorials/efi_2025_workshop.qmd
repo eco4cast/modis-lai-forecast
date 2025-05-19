@@ -68,6 +68,8 @@ packages will need to be installed:
 -   `assertthat`
 -   `minioclient`
 -   `purrr`
+-   `neonstore`
+-   `imputeTS`
 -   `remotes` (to install neon4cast from gitHub)
 -   `neon4cast` (from github)
 
@@ -88,6 +90,8 @@ install.packages('assertthat')
 install.packages('minioclient')
 install.packages('purrr')
 install.packages('remotes')
+install.packages('neonstore')
+install.packages('imputeTS')
 remotes::install_github('eco4cast/neon4cast') # package from NEON4cast challenge organisers to assist with forecast building and submission
 remotes::install_github("eco4cast/score4cast") # package to score forecasts
 ```
@@ -120,6 +124,8 @@ library(purrr)
 library(remotes)
 library(neon4cast)
 library(minioclient)
+library(neonstore)
+library(imputeTS)
 ```
 
 # 2 Introduction
@@ -228,7 +234,7 @@ are focusing on for this workshop.
 
 **When**: Target data are available as early as 2010 across our selected
 fires for monthly averages in LAI for each cell for each fire. Forecasts
-are accepted up to 3 months ahead on a monthly time step.w
+are accepted up to 3 months ahead on a monthly time step.
 
 # 3 Forecasting MODIS LAI Recovery Post Fire
 
