@@ -625,11 +625,54 @@ scores using the `scoringRules` package under the hood.
 
 ## 4.2 How to score your own forecast
 
--   Which model(s) did best?
--   What might explain the differences in scores between the different
-    models?
+To score your forecast locally, you can use the functions `scoring_spat_parametric` 
+or `scoring_spat_ensemble`. The functions each require a directory which includes your forecast (similar to `spat4cast_submit`), a target file (which contains the actual measurements for which you built the forecast), and a directory to hold GeoTiffs. If the option `tiff = TRUE` is used (default), then the function will print the mean LogS score and CRPS score, and return a directory where tiffs with the individual gridcell scores are held. If `tiff = FALSE` is used, the scoring functions will return a named vector which contains the mean LogS score and mean CRPS score for the forecast. lets look at using these functions:
+  
+  ```{r}
+score_vector <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
+                                        scores_dir = "scores")
 
-## 4.3 Improving your forecasts: Incorporating additional data
+print(score_vector)
+```
+
+```{r}
+score_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
+                                     scores_dir = "scores")
+```
+
+Now that we have scored a forecast, lets look at visualizing how we did:
+  
+  ```{r}
+
+plot(rast(paste0(score_dir,"/",list.files(score_dir))))
+
+```
+
+## 4.3 How to get your official scores
+
+Generally, you will not be able to score your forecast immediately after submitting it, if you are truly forecasting - forecasts aim to predict an outcome _/which hasn't occurred yet/_. When new targets are available, you may score your forecast on your own, using the `spat4cast_get_target` function to retrieve the new target and then applying a scoring function `scoring_spat_parametric` or `scoring_spat_ensemble`. 
+
+Alternatively, you can pull your official score with the `spat4cast_get_score` function. The function requires the name of your forecast, the date it was submitted, and the fire/site you submitted the forecast for. It pulls GeoTiff files which contain the scores from the minIO bucket, similar to the `scoring_spat_` functions with `tiff = TRUE`. Lets pull a score for an existing forecast:
+
+```{r}
+scores_dir <- spat4cast_get_score(ref_date = "2025-04-30", model_id = "johnsmith",
+                                  fire = "august_complex", dir = "scores")
+
+```
+
+After pulling the score GeoTiffs from the minIO bucket, we can visualize them, and calculate summaries:
+
+```{r}
+plot(rast(paste0(scores_dir,"/",list.files(score_dir))))
+
+crps_rast <- rast(paste0(scores_dir, "/crps_scores.tif"))
+logs_rast <- rast(paste0(scores_dir, "/logs_scores.tif"))
+
+print(paste0("Mean CRPS Score: ", mean(values(crps_rast), na.rm = TRUE)))
+print(paste0("Mean CRPS Score: ", mean(values(logs_rast), na.rm = TRUE)))
+```
+
+## 4.4 Improving your forecasts: Incorporating additional data
 
 An obvious choice for improving on the baseline models presented here is
 to incorporate covariate information into our forecasts of LAI. Three of
