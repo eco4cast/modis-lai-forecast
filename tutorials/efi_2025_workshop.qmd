@@ -228,7 +228,7 @@ are focusing on for this workshop.
 
 **When**: Target data are available as early as 2010 across our selected
 fires for monthly averages in LAI for each cell for each fire. Forecasts
-are accepted up to 3 months ahead on a monthly time step.w
+will be accepted up to 3 months ahead on a monthly time step.
 
 # 3 Forecasting MODIS LAI Recovery Post Fire
 
@@ -282,7 +282,7 @@ a target for our forecast.
 
 ```{r}
 raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
-                                  end_date = "2025-05-01",
+                                  end_date = "2025-04-01",
                                   fire = "august_complex",
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
@@ -294,7 +294,7 @@ raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
                                   resampling = "near",
                                   variable = "lai_recovery")
 
-target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
+target_dir <- spat4cast_get_target(date = "2025-03-01", fire = "august_complex")
 
 ```
 
@@ -517,15 +517,17 @@ Does this forecast seem reasonable?
 
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
+To submit a forecast to the challenge, use the `spat4cast_submit` function. As arguments, this function requires a directory and a model_id for your model. The directory should contain all necessary GeoTiff files for your forecast (formatting requirements in next section). On the minIO bucket, forecasts with the same name are organized by the date that they are submitted. So, if you wish to submit multiple different forecasts on the same day, make sure your model_id is unique, or else it will be overwritten by subsequent submissions with the same model_id that are submitted on the same day. Notably, you should keep track of the day that you are submitting the forecast, since you will need a reference date to retrieve your score. 
+
 ```{r, eval = FALSE}
 install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
 
 ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsemble')
+  spat4cast_submit(model_id = 'johnsemble', site_id = "august_complex")
 
 parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'parametsmith')
+  spat4cast_submit(model_id = 'parametsmith', site_id = "august_complex")
 ```
 
 # 4 Evaluating your forecast
@@ -622,11 +624,56 @@ scores using the `scoringRules` package under the hood.
 
 ## 4.2 How to score your own forecast
 
--   Which model(s) did best?
--   What might explain the differences in scores between the different
-    models?
+To score your forecast locally, you can use the functions `scoring_spat_parametric` 
+or `scoring_spat_ensemble`. The functions each require a directory which includes your forecast (similar to `spat4cast_submit`), a target file (which contains the actual measurements for which you built the forecast), and a directory to hold GeoTiffs. If the option `tiff = TRUE` is used (default), then the function will print the mean LogS score and CRPS score, and return a directory where tiffs with the individual gridcell scores are held. If `tiff = FALSE` is used, the scoring functions will return a named vector which contains the mean LogS score and mean CRPS score for the forecast. lets look at using these functions:
 
-## 4.3 Improving your forecasts: Incorporating additional data
+```{r}
+score_vector <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
+                      scores_dir = "scores")
+
+print(score_vector)
+```
+
+```{r}
+score_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
+                      scores_dir = "scores")
+```
+
+Now that we have scored a forecast, lets look at visualizing how we did:
+
+```{r}
+
+plot(rast(paste0(score_dir,"/",list.files(score_dir))))
+
+```
+
+## 4.3 How to get your official scores
+
+Generally, you will not be able to score your forecast immediately after submitting it, if you are truly forecasting - forecasts aim to predict an outcome _/which hasn't occurred yet/_. When new targets are available, you may score your forecast on your own, using the `spat4cast_get_target` function to retrieve the new target and then applying a scoring function `scoring_spat_parametric` or `scoring_spat_ensemble`. 
+
+Alternatively, you can pull your official score with the `spat4cast_get_score` function. The function requires the name of your forecast, the date it was submitted, and the fire/site you submitted the forecast for. It pulls GeoTiff files which contain the scores from the minIO bucket, similar to the `scoring_spat_` functions with `tiff = TRUE`. Lets pull a score for an existing forecast:
+
+```{r}
+scores_dir <- spat4cast_get_score(ref_date = "2025-04-30", model_id = "johnsmith",
+                                  fire = "august_complex", dir = "scores")
+
+```
+
+After pulling the score GeoTiffs from the minIO bucket, we can visualize them, and calculate summaries:
+
+```{r}
+plot(rast(paste0(scores_dir,"/",list.files(score_dir))))
+
+crps_rast <- rast(paste0(scores_dir, "/crps_scores.tif"))
+logs_rast <- rast(paste0(scores_dir, "/logs_scores.tif"))
+
+print(paste0("Mean CRPS Score: ", mean(values(crps_rast), na.rm = TRUE)))
+print(paste0("Mean CRPS Score: ", mean(values(logs_rast), na.rm = TRUE)))
+```
+
+
+
+## 4.4 Improving your forecasts: Incorporating additional data
 
 An obvious choice for improving on the baseline models presented here is
 to incorporate covariate information into our forecasts of LAI. Three of

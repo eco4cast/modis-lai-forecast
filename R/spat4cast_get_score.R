@@ -16,7 +16,7 @@
 #' ingest_planetary_data(start_date = "2022-01-01", end_date = "2023-07-01", box =  c("xmin" = -123, "ymin" = 39, "xmax" = -122, "ymax" = 40))
 #' @export
 #' 
-spat4cast_get_score <- function(date = "2025-04-01", fire = "august_complex", model_id = "arima-grid-model", dir = "scores"){
+spat4cast_get_score <- function(ref_date = "2025-04-01", fire = "august_complex", model_id = "arima-grid-model", dir = "scores"){
   
   # set mc_alias
   mc_alias_set("efi", "data.ecoforecast.org", "", "")
@@ -27,7 +27,7 @@ spat4cast_get_score <- function(date = "2025-04-01", fire = "august_complex", mo
   # Get the most recent reference date
   
   # Copy files from miniobucket
-  mc_cp(paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=", ref_date,"/"), "scores", recursive = TRUE)
+  mc_cp(paste0("efi/spat4cast-scores/duration=P1M/variable=lai_recovery/site_id=",fire,"/model_id=",model_id,"/reference_date=", ref_date,"/"), dir, recursive = TRUE)
   
   return(dir)
 }

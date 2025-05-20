@@ -30,7 +30,7 @@
 #' 
 
 
-scoring_spat_parametric <- function(fc_dir, target, scores_dir){
+scoring_spat_parametric <- function(fc_dir, target, scores_dir = "scores", tiff = TRUE){
   
   # get targets as a raster
   target_rast <- rast(target, vsi=TRUE)
@@ -379,18 +379,36 @@ logs_raster <-
               crs = crs(target_rast)) %>% # Get cood system from parameter raster
   setValues(logs_scores)
 
+# Name bands in raster
+set.names(crps_raster, c("crps_score"), index = 1)
+set.names(logs_raster, c("logs_score"), index = 1)
+
+
+
+
+
+# Get mean scores across spatial distribution
+mean_logs <- mean(values(logs_raster), na.rm = TRUE)
+mean_crps <- mean(values(crps_raster), na.rm = TRUE)
+
+mean_scores <- c(mean_logs = mean_logs, mean_crps = mean_crps)
+
+if(tiff == TRUE){
 ## check for scoring directory
 dir.create(scores_dir, FALSE)
-
+  
 # Save scores into .tifs
 terra::writeRaster(crps_raster, 
-                   filename = paste0(scores_dir, "/crps_scores.tif"),
-                   overwrite=TRUE)
+                     filename = paste0(scores_dir, "/crps_scores.tif"),
+                     overwrite=TRUE)
 terra::writeRaster(logs_raster, 
                    filename = paste0(scores_dir, '/logs_scores.tif'),
                    overwrite=TRUE)
+print(paste0("Mean LogS : ", mean_logs, " , Mean CRPS: ", mean_crps))
+return(scores_dir)
+  }else{
+  return(mean_scores)
+}
 
-
-return(scores_dir) 
 
 }

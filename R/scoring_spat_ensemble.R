@@ -30,7 +30,7 @@
 #' 
 
 
-scoring_spat_ensemble <- function(fc_dir, target, scores_dir){
+scoring_spat_ensemble <- function(fc_dir, target, scores_dir = "scores", tiff = TRUE){
   ## pull most recent target raster
   #last(sort(dir_ls(paste0(target_dir, '/'))))
   target_rast <- rast(target, vsi=TRUE)
@@ -60,17 +60,32 @@ scoring_spat_ensemble <- function(fc_dir, target, scores_dir){
   logs_scores <- target_rast
   values(crps_scores) <- matrix(crps_ensemble, ncol = 1)
   values(logs_scores) <- matrix(logs_ensemble, ncol = 1)
+  # Name bands in raster
+  set.names(crps_scores, c("crps_score"), index = 1)
+  set.names(logs_scores, c("logs_score"), index = 1)
+  # 
   
-  ## check for scoring directory
-  dir.create(scores_dir, FALSE)
+  # Get mean scores across spatial distribution
+  mean_logs <- mean(values(logs_scores), na.rm = TRUE)
+  mean_crps <- mean(values(crps_scores), na.rm = TRUE)
   
-  ## write tif files for crps and log scores
-  terra::writeRaster(crps_scores, 
-                     filename = paste0(scores_dir, '/crps_scores.tif'),
-                     overwrite=TRUE)
-  terra::writeRaster(logs_scores, 
-                     filename = paste0(scores_dir, '/logs_scores.tif'),
-                     overwrite=TRUE)
+  mean_scores <- c(mean_logs = mean_logs, mean_crps = mean_crps)
   
-  return(scores_dir)
+  if(tiff == TRUE){
+    ## check for scoring directory
+    dir.create(scores_dir, FALSE)
+    
+    # Save scores into .tifs
+    terra::writeRaster(crps_scores, 
+                       filename = paste0(scores_dir, "/crps_scores.tif"),
+                       overwrite=TRUE)
+    terra::writeRaster(logs_scores, 
+                       filename = paste0(scores_dir, '/logs_scores.tif'),
+                       overwrite=TRUE)
+    print(paste0("Mean LogS : ", mean_logs, " , Mean CRPS: ", mean_crps))
+    return(scores_dir)
+  }else{
+    return(mean_scores)
+  }
+  
 }
