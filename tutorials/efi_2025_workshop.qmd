@@ -68,6 +68,8 @@ packages will need to be installed:
 -   `assertthat`
 -   `minioclient`
 -   `purrr`
+-   `neonstore`
+-   `imputeTS`
 -   `remotes` (to install neon4cast from gitHub)
 -   `neon4cast` (from github)
 
@@ -88,6 +90,8 @@ install.packages('assertthat')
 install.packages('minioclient')
 install.packages('purrr')
 install.packages('remotes')
+install.packages('neonstore')
+install.packages('imputeTS')
 remotes::install_github('eco4cast/neon4cast') # package from NEON4cast challenge organisers to assist with forecast building and submission
 remotes::install_github("eco4cast/score4cast") # package to score forecasts
 ```
@@ -120,6 +124,8 @@ library(purrr)
 library(remotes)
 library(neon4cast)
 library(minioclient)
+library(neonstore)
+library(imputeTS)
 ```
 
 # 2 Introduction
@@ -131,8 +137,9 @@ Initiative Research Coordination Network ([EFI
 RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are
 the first to set up a system to continually compile and score community
 generated forecasts for true out of sample data prior to data
-collection. *Some additional comments about the temporal challenge
-here*. Questions about ecosystems and ecosystem services are inherently
+collection. These forecast challenges are extremely helpful for understanding how long
+into the future we can predict certain ecological properties and what types of models
+perform best. Questions about ecosystems and ecosystem services are inherently
 focused on the future because they involve understanding how natural
 systems will respond to changing environmental, social, and economic
 conditions over time. Commonly ecosystems are analyzed as single
@@ -222,19 +229,7 @@ for the each month instead of the 8 days of the MODIS LAI product.
 
 -   `LAI`: Leaf Area Index in each cell within the fire bounding box.
 
-**Where**: 1 Fire selected from the [Fire
-Database](https://www.mtbs.gov/). The august complex fire is the one we
-are focusing on for this workshop.
-
-**When**: Target data are available as early as 2010 across our selected
-fires for monthly averages in LAI for each cell for each fire. Forecasts
-will be accepted up to 3 months ahead on a monthly time step.
-
-# 3 Forecasting MODIS LAI Recovery Post Fire
-
-## 3.1 Define spatial and temporal parameters for our forecast
-
-Before we can forecast fire recovery, we first need to define the fires
+**Where**: Before we can forecast fire recovery, we first need to define the fires
 of interest and their spatial extents. We have initially selected a
 handful of fires that span ecosystem types, occurred in close proximity
 to NEON sites to provide additional data sources for modeling efforts,
@@ -259,7 +254,15 @@ spatial forecast system are:
     and around Great Smoky Mountain National Park ([NEON
     GRSM](https://www.neonscience.org/field-sites/grsm))
 
-The target areas for these fires are available in the `/shp` directory
+**When**: Target data are available as early as 2010 across our selected
+fires for monthly averages in LAI for each cell for each fire. Forecasts
+are accepted up to 1 month ahead on a monthly time step.
+
+# 3 Forecasting MODIS LAI Recovery Post Fire
+
+## 3.1 Define spatial and temporal parameters for our forecast
+
+The target areas for the fires of interest are available in the `/shp` directory
 in Github repository. The `fire_box` function is available to grab the
 target area for each fire. The `pad_box` argument will pad a 0.5 degrees
 on each side on each side of the bounding box as defined by the fire
@@ -282,7 +285,7 @@ a target for our forecast.
 
 ```{r}
 raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
-                                  end_date = "2025-04-01",
+                                  end_date = "2025-05-01",
                                   fire = "august_complex",
                                   collection = "modis-15A2H-061",
                                   asset_name = "Lai_500m",
@@ -294,7 +297,7 @@ raster_cube <- spat4cast_get_data(start_date = "2002-01-01",
                                   resampling = "near",
                                   variable = "lai_recovery")
 
-target_dir <- spat4cast_get_target(date = "2025-03-01", fire = "august_complex")
+target_dir <- spat4cast_get_target(date = "2025-04-01", fire = "august_complex")
 
 ```
 
@@ -336,7 +339,7 @@ currently implemented are:
 
 We also have two baseline models in the development and debugging
 stage: - A spatio-temporal ICAR random walk - A spatio-temporal Gaussian
-Process
+Process.
 
 For now, the first two models that we have implemented will provide
 reasonable competitors to the models developed by challenge
@@ -517,17 +520,15 @@ Does this forecast seem reasonable?
 
 ## 3.6 How to submit a forecast to the NEON Forecast Challenge
 
-To submit a forecast to the challenge, use the `spat4cast_submit` function. As arguments, this function requires a directory and a model_id for your model. The directory should contain all necessary GeoTiff files for your forecast (formatting requirements in next section). On the minIO bucket, forecasts with the same name are organized by the date that they are submitted. So, if you wish to submit multiple different forecasts on the same day, make sure your model_id is unique, or else it will be overwritten by subsequent submissions with the same model_id that are submitted on the same day. Notably, you should keep track of the day that you are submitting the forecast, since you will need a reference date to retrieve your score. 
-
 ```{r, eval = FALSE}
 install_mc()
 mc_alias_set("efi", "data.ecoforecast.org", access_key = "", secret_key = "")
 
 ensemble_forecast_dir |>
-  spat4cast_submit(model_id = 'johnsemble', site_id = "august_complex")
+  spat4cast_submit(model_id = 'johnsemble')
 
 parametric_forecast_dir1 |>
-  spat4cast_submit(model_id = 'parametsmith', site_id = "august_complex")
+  spat4cast_submit(model_id = 'parametsmith')
 ```
 
 # 4 Evaluating your forecast
@@ -624,56 +625,11 @@ scores using the `scoringRules` package under the hood.
 
 ## 4.2 How to score your own forecast
 
-To score your forecast locally, you can use the functions `scoring_spat_parametric` 
-or `scoring_spat_ensemble`. The functions each require a directory which includes your forecast (similar to `spat4cast_submit`), a target file (which contains the actual measurements for which you built the forecast), and a directory to hold GeoTiffs. If the option `tiff = TRUE` is used (default), then the function will print the mean LogS score and CRPS score, and return a directory where tiffs with the individual gridcell scores are held. If `tiff = FALSE` is used, the scoring functions will return a named vector which contains the mean LogS score and mean CRPS score for the forecast. lets look at using these functions:
+-   Which model(s) did best?
+-   What might explain the differences in scores between the different
+    models?
 
-```{r}
-score_vector <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
-                      scores_dir = "scores")
-
-print(score_vector)
-```
-
-```{r}
-score_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
-                      scores_dir = "scores")
-```
-
-Now that we have scored a forecast, lets look at visualizing how we did:
-
-```{r}
-
-plot(rast(paste0(score_dir,"/",list.files(score_dir))))
-
-```
-
-## 4.3 How to get your official scores
-
-Generally, you will not be able to score your forecast immediately after submitting it, if you are truly forecasting - forecasts aim to predict an outcome _/which hasn't occurred yet/_. When new targets are available, you may score your forecast on your own, using the `spat4cast_get_target` function to retrieve the new target and then applying a scoring function `scoring_spat_parametric` or `scoring_spat_ensemble`. 
-
-Alternatively, you can pull your official score with the `spat4cast_get_score` function. The function requires the name of your forecast, the date it was submitted, and the fire/site you submitted the forecast for. It pulls GeoTiff files which contain the scores from the minIO bucket, similar to the `scoring_spat_` functions with `tiff = TRUE`. Lets pull a score for an existing forecast:
-
-```{r}
-scores_dir <- spat4cast_get_score(ref_date = "2025-04-30", model_id = "johnsmith",
-                                  fire = "august_complex", dir = "scores")
-
-```
-
-After pulling the score GeoTiffs from the minIO bucket, we can visualize them, and calculate summaries:
-
-```{r}
-plot(rast(paste0(scores_dir,"/",list.files(score_dir))))
-
-crps_rast <- rast(paste0(scores_dir, "/crps_scores.tif"))
-logs_rast <- rast(paste0(scores_dir, "/logs_scores.tif"))
-
-print(paste0("Mean CRPS Score: ", mean(values(crps_rast), na.rm = TRUE)))
-print(paste0("Mean CRPS Score: ", mean(values(logs_rast), na.rm = TRUE)))
-```
-
-
-
-## 4.4 Improving your forecasts: Incorporating additional data
+## 4.3 Improving your forecasts: Incorporating additional data
 
 An obvious choice for improving on the baseline models presented here is
 to incorporate covariate information into our forecasts of LAI. Three of
@@ -706,8 +662,7 @@ site <- 'SOAP'
 
 The second step is to find a data product that contains your covariate
 of interest. While these seems like it may be a daunting task, thanks to
-NEON's wonderful data portal (found \[here\]:
-(https://data.neonscience.org/)) it is not difficult at all. Searching
+NEON's wonderful data portal (found [here](https://data.neonscience.org/)) it is not difficult at all. Searching
 "air temperature" in the data portal search bar gives us multiple
 options: we will go with Triple Aspirated Air Temperature
 (`DP1.00003.001`).
@@ -859,6 +814,10 @@ plot(rastSbs)
     Different forecast horizons?
 -   How could you apply what you have learned here in your research or
     teaching?
+    
+Please take the time to provide feedback on the workshop and what you are interested
+in regarding the post fire recovery challenge as we move towards the official launch
+of the challenge. [Spatial Workshop Survey](https://docs.google.com/forms/d/e/1FAIpQLSfZ-NtxKjySj6gTnO-6mdfXCZAzQPZPQYoKiVm6S2-EkJ2iMA/viewform?usp=dialog)
 
 # 6 Acknowledgements
 
