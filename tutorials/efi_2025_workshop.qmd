@@ -137,8 +137,9 @@ Initiative Research Coordination Network ([EFI
 RCN](https://ecoforecast.org/)). The EFI-NEON Forecasting Challenges are
 the first to set up a system to continually compile and score community
 generated forecasts for true out of sample data prior to data
-collection. *Some additional comments about the temporal challenge
-here*. Questions about ecosystems and ecosystem services are inherently
+collection. These forecast challenges are extremely helpful for understanding how long
+into the future we can predict certain ecological properties and what types of models
+perform best. Questions about ecosystems and ecosystem services are inherently
 focused on the future because they involve understanding how natural
 systems will respond to changing environmental, social, and economic
 conditions over time. Commonly ecosystems are analyzed as single
@@ -228,19 +229,7 @@ for the each month instead of the 8 days of the MODIS LAI product.
 
 -   `LAI`: Leaf Area Index in each cell within the fire bounding box.
 
-**Where**: 1 Fire selected from the [Fire
-Database](https://www.mtbs.gov/). The august complex fire is the one we
-are focusing on for this workshop.
-
-**When**: Target data are available as early as 2010 across our selected
-fires for monthly averages in LAI for each cell for each fire. Forecasts
-are accepted up to 3 months ahead on a monthly time step.
-
-# 3 Forecasting MODIS LAI Recovery Post Fire
-
-## 3.1 Define spatial and temporal parameters for our forecast
-
-Before we can forecast fire recovery, we first need to define the fires
+**Where**: Before we can forecast fire recovery, we first need to define the fires
 of interest and their spatial extents. We have initially selected a
 handful of fires that span ecosystem types, occurred in close proximity
 to NEON sites to provide additional data sources for modeling efforts,
@@ -265,7 +254,15 @@ spatial forecast system are:
     and around Great Smoky Mountain National Park ([NEON
     GRSM](https://www.neonscience.org/field-sites/grsm))
 
-The target areas for these fires are available in the `/shp` directory
+**When**: Target data are available as early as 2010 across our selected
+fires for monthly averages in LAI for each cell for each fire. Forecasts
+are accepted up to 1 month ahead on a monthly time step.
+
+# 3 Forecasting MODIS LAI Recovery Post Fire
+
+## 3.1 Define spatial and temporal parameters for our forecast
+
+The target areas for the fires of interest are available in the `/shp` directory
 in Github repository. The `fire_box` function is available to grab the
 target area for each fire. The `pad_box` argument will pad a 0.5 degrees
 on each side on each side of the bounding box as defined by the fire
