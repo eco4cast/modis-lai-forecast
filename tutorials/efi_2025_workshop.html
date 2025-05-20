@@ -426,13 +426,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="how-to-score-your-own-forecast" class="level2">
 <h2 class="anchored" data-anchor-id="how-to-score-your-own-forecast">4.2 How to score your own forecast</h2>
-<ul>
-<li>Which model(s) did best?</li>
-<li>What might explain the differences in scores between the different models?</li>
-</ul>
+<p>To score your forecast locally, you can use the functions <code>scoring_spat_parametric</code> or <code>scoring_spat_ensemble</code>. The functions each require a directory which includes your forecast (similar to <code>spat4cast_submit</code>), a target file (which contains the actual measurements for which you built the forecast), and a directory to hold GeoTiffs. If the option <code>tiff = TRUE</code> is used (default), then the function will print the mean LogS score and CRPS score, and return a directory where tiffs with the individual gridcell scores are held. If <code>tiff = FALSE</code> is used, the scoring functions will return a named vector which contains the mean LogS score and mean CRPS score for the forecast. lets look at using these functions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>score_vector <span class="ot">&lt;-</span> <span class="fu">scoring_spat_parametric</span>(<span class="at">fc_dir =</span> parametric_forecast_dir1, <span class="at">target =</span> target_dir,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">scores_dir =</span> <span class="st">"scores"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean LogS : 2.77979652888315 , Mean CRPS: 1.76181133412093"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(score_vector)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "scores"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>score_dir <span class="ot">&lt;-</span> <span class="fu">scoring_spat_parametric</span>(<span class="at">fc_dir =</span> parametric_forecast_dir1, <span class="at">target =</span> target_dir,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">scores_dir =</span> <span class="st">"scores"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean LogS : 2.77979652888315 , Mean CRPS: 1.76181133412093"</code></pre>
+</div>
+</div>
+<p>Now that we have scored a forecast, lets look at visualizing how we did:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">rast</span>(<span class="fu">paste0</span>(score_dir,<span class="st">"/"</span>,<span class="fu">list.files</span>(score_dir))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="efi_2025_workshop_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="how-to-get-your-official-scores" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-get-your-official-scores">4.3 How to get your official scores</h2>
+<p>Generally, you will not be able to score your forecast immediately after submitting it, if you are truly forecasting - forecasts aim to predict an outcome <em>/which hasn’t occurred yet/</em>. When new targets are available, you may score your forecast on your own, using the <code>spat4cast_get_target</code> function to retrieve the new target and then applying a scoring function <code>scoring_spat_parametric</code> or <code>scoring_spat_ensemble</code>.</p>
+<p>Alternatively, you can pull your official score with the <code>spat4cast_get_score</code> function. The function requires the name of your forecast, the date it was submitted, and the fire/site you submitted the forecast for. It pulls GeoTiff files which contain the scores from the minIO bucket, similar to the <code>scoring_spat_</code> functions with <code>tiff = TRUE</code>. Lets pull a score for an existing forecast:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>scores_dir <span class="ot">&lt;-</span> <span class="fu">spat4cast_get_score</span>(<span class="at">ref_date =</span> <span class="st">"2025-04-30"</span>, <span class="at">model_id =</span> <span class="st">"johnsmith"</span>,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">fire =</span> <span class="st">"august_complex"</span>, <span class="at">dir =</span> <span class="st">"scores"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in dir.create(dir): 'scores' already exists</code></pre>
+</div>
+</div>
+<p>After pulling the score GeoTiffs from the minIO bucket, we can visualize them, and calculate summaries:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">rast</span>(<span class="fu">paste0</span>(scores_dir,<span class="st">"/"</span>,<span class="fu">list.files</span>(score_dir))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="efi_2025_workshop_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>crps_rast <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(scores_dir, <span class="st">"/crps_scores.tif"</span>))</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>logs_rast <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">paste0</span>(scores_dir, <span class="st">"/logs_scores.tif"</span>))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Mean CRPS Score: "</span>, <span class="fu">mean</span>(<span class="fu">values</span>(crps_rast), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean CRPS Score: 3.92295065251264"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Mean CRPS Score: "</span>, <span class="fu">mean</span>(<span class="fu">values</span>(logs_rast), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean CRPS Score: 3.21032469922846"</code></pre>
+</div>
+</div>
 </section>
 <section id="improving-your-forecasts-incorporating-additional-data" class="level2">
-<h2 class="anchored" data-anchor-id="improving-your-forecasts-incorporating-additional-data">4.3 Improving your forecasts: Incorporating additional data</h2>
+<h2 class="anchored" data-anchor-id="improving-your-forecasts-incorporating-additional-data">4.4 Improving your forecasts: Incorporating additional data</h2>
 <p>An obvious choice for improving on the baseline models presented here is to incorporate covariate information into our forecasts of LAI. Three of our focal fires occurred at NEON sites. This means that we have access to a wealth of covariate information, if we are able to access it and process it! In this section, we provide example code that uses the <code>neonstore</code> package to pull and aggregate NEON data for:</p>
 <ul>
 <li>Temperature (daily minimum and maximum temperature)</li>
@@ -447,94 +499,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>(Optional) Imputing missing data</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## set site to desired NEON site</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="do">## here we will use SOAP, but the other focal</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="do">## sites can be used (GRSM or SRER)</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>site <span class="ot">&lt;-</span> <span class="st">'SOAP'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="do">## set site to desired NEON site</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="do">## here we will use SOAP, but the other focal</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="do">## sites can be used (GRSM or SRER)</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>site <span class="ot">&lt;-</span> <span class="st">'SOAP'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The second step is to find a data product that contains your covariate of interest. While these seems like it may be a daunting task, thanks to NEON’s wonderful data portal (found <a href="https://data.neonscience.org/">here</a>) it is not difficult at all. Searching “air temperature” in the data portal search bar gives us multiple options: we will go with Triple Aspirated Air Temperature (<code>DP1.00003.001</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## air temp data product</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>air_temp_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00003.001'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## air temp data product</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>air_temp_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00003.001'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Once we have identified our site and data product of interest, we can use the <code>neon_download</code> function from the <code>neonstore</code> package to pull the data. For further reading on <code>neonstore</code>, Claire K. Lunch has an excellent tutorial that can be found <a href="https://www.neonscience.org/resources/learning-hub/tutorials/neonstore-stackfromstore-tutorial">here</a>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## use neonstore package "neon_download" function to pull data product</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="do">## for triple aspirated air temperature</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> air_temp_dp, <span class="at">site =</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## use neonstore package "neon_download" function to pull data product</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="do">## for triple aspirated air temperature</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> air_temp_dp, <span class="at">site =</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>With our data product of interest downloaded, we can now focus on aggregation to our desired timescale. Triple aspirated air temperature is available as one and thirty minute averages, and here we demonstrate how to aggregate to daily minimum and maximum temperature.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## read the 30 minute measurements into temp_table</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>temp_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"TAAT_30min-basic"</span>, <span class="at">site =</span> site)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="do">## create table of minimum and maximum temps</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>temp_info <span class="ot">&lt;-</span> temp_table <span class="sc">%&gt;%</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="do">## use lubridate to extract date format</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="do">## extract only max and min data that does not</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">## have a quality flag </span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">tempTripleMaximum =</span> <span class="fu">if_else</span>(finalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                              tempTripleMaximum,</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>),</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">tempTripleMinimum =</span> <span class="fu">if_else</span>(finalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                              tempTripleMinimum,</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="do">## group_by date to get daily mins/maxs</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="do">## compute minimums and maximums</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">MinT_daily =</span> <span class="fu">min</span>(tempTripleMinimum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">MaxT_daily =</span> <span class="fu">max</span>(tempTripleMaximum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">## change infinite values to NAs for interpolation</span></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.infinite</span>(.), <span class="cn">NA</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="do">## read the 30 minute measurements into temp_table</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>temp_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"TAAT_30min-basic"</span>, <span class="at">site =</span> site)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="do">## create table of minimum and maximum temps</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>temp_info <span class="ot">&lt;-</span> temp_table <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="do">## use lubridate to extract date format</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="do">## extract only max and min data that does not</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">## have a quality flag </span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">tempTripleMaximum =</span> <span class="fu">if_else</span>(finalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>                              tempTripleMaximum,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>),</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">tempTripleMinimum =</span> <span class="fu">if_else</span>(finalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>                              tempTripleMinimum,</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="do">## group_by date to get daily mins/maxs</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="do">## compute minimums and maximums</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">MinT_daily =</span> <span class="fu">min</span>(tempTripleMinimum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">MaxT_daily =</span> <span class="fu">max</span>(tempTripleMaximum, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">## change infinite values to NAs for interpolation</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.infinite</span>(.), <span class="cn">NA</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The optional fourth step is imputation of missing data. In this example, we provide code for data imputation using a Kalman filter. We do note that data imputation can be done in many different ways, and thus in the example covariate data provided we include columns with both aggregated imputed data and aggregated raw data for any user who would like to employ their own imputation strategies.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(imputeTS) <span class="do">## for na_kalman</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="do">## interpolate missing temperature values using a kalman filter</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>temp_info<span class="sc">$</span>MinTInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(temp_info<span class="sc">$</span>MinT_daily)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>temp_info<span class="sc">$</span>MaxTInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(temp_info<span class="sc">$</span>MaxT_daily)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(imputeTS) <span class="do">## for na_kalman</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="do">## interpolate missing temperature values using a kalman filter</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>temp_info<span class="sc">$</span>MinTInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(temp_info<span class="sc">$</span>MinT_daily)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>temp_info<span class="sc">$</span>MaxTInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(temp_info<span class="sc">$</span>MaxT_daily)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Though we won’t go through them in detail, additional code for pulling and aggregating shortwave radiation and relative humidity data is below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## set data product for shortwave radiation (primary pyranometer)</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>swpp_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00014.001'</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="do">## download shortwave radiation data from NEON</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> swpp_dp, <span class="at">site =</span> site)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="do">## extract 30 minute shortwave radiation data</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>rad_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"SRDDP_30min-basic"</span>, <span class="at">site =</span> site)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>rad_info <span class="ot">&lt;-</span> rad_table <span class="sc">%&gt;%</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">gloRadMean =</span> <span class="fu">if_else</span>(gloRadFinalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                              gloRadMean,</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">DirRad =</span> <span class="fu">mean</span>(gloRadMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.nan</span>(.), <span class="cn">NA</span>))</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>rad_info<span class="sc">$</span>DirRadInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(rad_info<span class="sc">$</span>DirRad)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="do">## extract and aggregate radiation data to daily time</span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>rh_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00098.001'</span></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> rh_dp, <span class="at">site =</span> site)</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>rh_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"RH_30min"</span>, <span class="at">site =</span> site)</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>rh_info <span class="ot">&lt;-</span> rh_table <span class="sc">%&gt;%</span></span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">rhMean =</span> <span class="fu">if_else</span>(RHFinalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>                              RHMean,</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">RelHum =</span> <span class="fu">mean</span>(RHMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.nan</span>(.), <span class="cn">NA</span>))</span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>rh_info<span class="sc">$</span>RelHumInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(rh_info<span class="sc">$</span>RelHum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## set data product for shortwave radiation (primary pyranometer)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>swpp_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00014.001'</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="do">## download shortwave radiation data from NEON</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> swpp_dp, <span class="at">site =</span> site)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="do">## extract 30 minute shortwave radiation data</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>rad_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"SRDDP_30min-basic"</span>, <span class="at">site =</span> site)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>rad_info <span class="ot">&lt;-</span> rad_table <span class="sc">%&gt;%</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">gloRadMean =</span> <span class="fu">if_else</span>(gloRadFinalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>                              gloRadMean,</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">DirRad =</span> <span class="fu">mean</span>(gloRadMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.nan</span>(.), <span class="cn">NA</span>))</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>rad_info<span class="sc">$</span>DirRadInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(rad_info<span class="sc">$</span>DirRad)</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="do">## extract and aggregate radiation data to daily time</span></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>rh_dp <span class="ot">&lt;-</span> <span class="st">'DP1.00098.001'</span></span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a><span class="fu">neon_download</span>(<span class="at">product =</span> rh_dp, <span class="at">site =</span> site)</span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>rh_table <span class="ot">&lt;-</span> <span class="fu">neon_read</span>(<span class="st">"RH_30min"</span>, <span class="at">site =</span> site)</span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>rh_info <span class="ot">&lt;-</span> rh_table <span class="sc">%&gt;%</span></span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(endDateTime),</span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">rhMean =</span> <span class="fu">if_else</span>(RHFinalQF <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>                              RHMean,</span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>                              <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">RelHum =</span> <span class="fu">mean</span>(RHMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, <span class="sc">~</span></span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>              <span class="fu">replace</span>(., <span class="fu">is.nan</span>(.), <span class="cn">NA</span>))</span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>rh_info<span class="sc">$</span>RelHumInterp <span class="ot">&lt;-</span> <span class="fu">na_kalman</span>(rh_info<span class="sc">$</span>RelHum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="burn-severity-data" class="level3">
 <h3 class="anchored" data-anchor-id="burn-severity-data">Burn Severity Data</h3>
@@ -547,14 +599,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We have uploaded burn severity maps to the <code>spat4cast_data</code> bucket. These data can be gathered by using the <code>spat4cast_get_data()</code>function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>rastSbs <span class="ot">&lt;-</span> <span class="fu">spat4cast_get_data</span>(<span class="at">fire =</span> <span class="st">"august_complex"</span>,</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">variable =</span> <span class="st">"burn_severity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>rastSbs <span class="ot">&lt;-</span> <span class="fu">spat4cast_get_data</span>(<span class="at">fire =</span> <span class="st">"august_complex"</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">variable =</span> <span class="st">"burn_severity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in dir.create("files"): 'files' already exists</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rastSbs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rastSbs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="efi_2025_workshop_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+<p><img src="efi_2025_workshop_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
