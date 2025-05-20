@@ -628,7 +628,7 @@ scores using the `scoringRules` package under the hood.
 To score your forecast locally, you can use the functions `scoring_spat_parametric` 
 or `scoring_spat_ensemble`. The functions each require a directory which includes your forecast (similar to `spat4cast_submit`), a target file (which contains the actual measurements for which you built the forecast), and a directory to hold GeoTiffs. If the option `tiff = TRUE` is used (default), then the function will print the mean LogS score and CRPS score, and return a directory where tiffs with the individual gridcell scores are held. If `tiff = FALSE` is used, the scoring functions will return a named vector which contains the mean LogS score and mean CRPS score for the forecast. lets look at using these functions:
   
-  ```{r}
+```{r}
 score_vector <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target = target_dir,
                                         scores_dir = "scores")
 
@@ -642,7 +642,7 @@ score_dir <- scoring_spat_parametric(fc_dir = parametric_forecast_dir1, target =
 
 Now that we have scored a forecast, lets look at visualizing how we did:
   
-  ```{r}
+```{r}
 
 plot(rast(paste0(score_dir,"/",list.files(score_dir))))
 
